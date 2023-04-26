@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AworldAction</string>
+    <string name="login_btn">Accedi</string>
+    <string name="register_btn">Registrati</string>
+    <string name="next">Avanti ></string>
+    <string name="pass_recovery_link"><u>Recupera password</u></string>
+    <string name="new_account_link"><u>Crea nuovo account</u></string>
+    <string name="register_step_1">Inserisci i dati del tuo nuovo account</string>
+    <string name="login_link"><u>Ho già un account</u></string>
+    <string name="register_step_2">Crea una passwordo sicura</string>
+    <string name="confirm_passsword_hint">Conferma password</string>
+    <string name="upload_profile_photo">Carica una foto profilo</string>
+</resources>
