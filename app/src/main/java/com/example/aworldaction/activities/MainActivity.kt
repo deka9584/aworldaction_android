@@ -1,11 +1,10 @@
-package com.example.aworldaction
+package com.example.aworldaction.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
 
 class MainActivity : AppCompatActivity() {
@@ -23,10 +22,7 @@ class MainActivity : AppCompatActivity() {
 
         val logoutBtn = findViewById<Button>(R.id.logoutBtn)
         logoutBtn?.setOnClickListener {
-            val editor = appSettings?.edit()
-            editor?.remove("token")
-            editor?.apply()
-
+            (application as AppSettings).removeToken()
             val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
         }

@@ -1,11 +1,10 @@
-package com.example.aworldaction
+package com.example.aworldaction.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
 
 class WelcomeActivity : AppCompatActivity() {
@@ -33,8 +32,7 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val appSettings = (application as AppSettings).getPreferences()
-        val userToken: String? = appSettings?.getString("token", null)
+        val userToken = (application as AppSettings).getToken()
 
         if (userToken != null && userToken != "") {
             finish()

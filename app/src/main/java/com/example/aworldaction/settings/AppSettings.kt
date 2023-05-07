@@ -20,10 +20,17 @@ class AppSettings : Application() {
         return preferences.getString("token", null)
     }
 
-    fun setToken() {
+    fun setToken(token: String) {
         val editor = preferences.edit()
 
-        editor?.putString("token", "ciao")
-        editor?.apply()
+        editor.putString("token", token)
+        editor.apply()
+    }
+
+    fun removeToken() {
+        val editor = preferences.edit()
+
+        editor.remove("token")
+        editor.apply()
     }
 }

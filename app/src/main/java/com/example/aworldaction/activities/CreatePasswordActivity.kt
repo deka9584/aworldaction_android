@@ -1,7 +1,8 @@
-package com.example.aworldaction
+package com.example.aworldaction.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.aworldaction.R
 
 class CreatePasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
