@@ -5,18 +5,28 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
+import com.example.aworldaction.settings.AppSettings
 
 class MainActivity : AppCompatActivity() {
-    private var token: SharedPreferences? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        token = getSharedPreferences("token", Context.MODE_PRIVATE)
 
-        val userToken: String? = token?.getString("token", null)
+        val appSettings = (application as AppSettings).getPreferences()
+        val userToken: String? = appSettings?.getString("token", null)
 
         if (userToken == null) {
+            val intent = Intent(this, WelcomeActivity::class.java)
+            startActivity(intent)
+        }
+
+        val logoutBtn = findViewById<Button>(R.id.logoutBtn)
+        logoutBtn?.setOnClickListener {
+            val editor = appSettings?.edit()
+            editor?.remove("token")
+            editor?.apply()
+
             val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
         }

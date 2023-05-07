@@ -1,12 +1,14 @@
 package com.example.aworldaction
 
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import com.example.aworldaction.settings.AppSettings
 
 class WelcomeActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_welcome)
@@ -25,6 +27,17 @@ class WelcomeActivity : AppCompatActivity() {
         registerBtn.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val appSettings = (application as AppSettings).getPreferences()
+        val userToken: String? = appSettings?.getString("token", null)
+
+        if (userToken != null && userToken != "") {
+            finish()
         }
     }
 }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".settings.AppSettings"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -20,7 +21,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".uploadPhotoProfileActivity"
+            android:name=".UploadPhotoProfileActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
