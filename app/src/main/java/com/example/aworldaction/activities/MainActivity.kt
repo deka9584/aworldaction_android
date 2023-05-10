@@ -11,8 +11,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        AppSettings.init(this)
 
-        val appSettings = (application as AppSettings).getPreferences()
+        val appSettings = AppSettings.getPreferences()
         val userToken: String? = appSettings?.getString("token", null)
 
         if (userToken == null) {
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         val logoutBtn = findViewById<Button>(R.id.logoutBtn)
         logoutBtn?.setOnClickListener {
-            (application as AppSettings).removeToken()
+            AppSettings.removeToken()
             val intent = Intent(this, WelcomeActivity::class.java)
             startActivity(intent)
         }

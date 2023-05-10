@@ -32,7 +32,7 @@ class WelcomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        val userToken = (application as AppSettings).getToken()
+        val userToken = AppSettings.getToken()
 
         if (userToken != null && userToken != "") {
             finish()

@@ -2,6 +2,7 @@ package com.example.aworldaction.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -33,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
 
             if (email != "" && password != "") {
                 sendPostRequest(email, password)
-                // (application as AppSettings).setToken("ciao")
+                AppSettings.setToken("ciao")
                 finish()
             }
         }
@@ -41,14 +42,14 @@ class LoginActivity : AppCompatActivity() {
 
     private fun sendPostRequest(email: String, password: String) {
         val requestQueue = Volley.newRequestQueue(this)
-        val url = "http://127.0.0.1/api/login"
+        val url = AppSettings.getAPIUrl().toString() + "/login"
 
         val listener = Response.Listener<String> { response ->
-            //ss
+            Log.d("laravelApi", response)
         }
 
         val errorListener = Response.ErrorListener { error ->
-            //dd
+            Log.e("laravelApi", error.toString())
         }
 
         val request = object : StringRequest(

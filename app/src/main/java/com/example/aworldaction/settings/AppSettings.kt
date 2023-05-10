@@ -3,13 +3,18 @@ package com.example.aworldaction.settings
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import java.net.URL
 
-class AppSettings : Application() {
+object AppSettings {
+    private val apiUrl = URL("http://172.16.2.43:8000/api")
     private lateinit var preferences: SharedPreferences
 
-    override fun onCreate() {
-        super.onCreate()
-        preferences = getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+    fun init(context: Context) {
+        preferences = context.getSharedPreferences("app_settings", Context.MODE_PRIVATE)
+    }
+
+    fun getAPIUrl(): URL {
+        return apiUrl
     }
 
     fun getPreferences(): SharedPreferences {
