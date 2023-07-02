@@ -98,6 +98,12 @@ class RegisterActivity : AppCompatActivity() {
                 params["password_confirmation"] = passwordConfirm
                 return params
             }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Accept"] = "application/json"
+                return headers
+            }
         }
         requestQueue.add(request)
     }

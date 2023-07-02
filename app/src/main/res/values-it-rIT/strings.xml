@@ -16,4 +16,6 @@
     <string name="list_favourites">Preferiti</string>
     <string name="list_completed">Completate</string>
     <string name="detail_btn">Maggiori informazioni</string>
+    <string name="list_empty">Nessuna campagna trovata</string>
+    <string name="account">Il tuo account</string>
 </resources>

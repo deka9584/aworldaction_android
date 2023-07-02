@@ -17,12 +17,11 @@ import com.example.aworldaction.adapters.CampaignAdapter
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
-private const val TO_SHOW = "param1"
-
-class InprogressListFragment : Fragment() {
-    private var toShow: String? = null
+class ListFragment : Fragment() {
     private var campaginList = ArrayList<JSONObject>()
+    private var toShow: String? = null
     private var viewTitle: TextView? = null
+    private var statusDisplay: TextView? = null
     private var recyclerView: RecyclerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,11 +39,14 @@ class InprogressListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_inprogress_list, container, false)
+        return inflater.inflate(R.layout.fragment_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        statusDisplay = view.findViewById(R.id.statusDisplay)
+
         recyclerView = view.findViewById(R.id.campaignList)
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
         recyclerView?.adapter = CampaignAdapter(campaginList, requireContext())
@@ -81,6 +83,13 @@ class InprogressListFragment : Fragment() {
                 }
 
                 recyclerView?.adapter = CampaignAdapter(campaginList, requireContext())
+
+                if (campaginList.size == 0) {
+                    statusDisplay?.visibility = View.VISIBLE
+                    statusDisplay?.text = resources.getString(R.string.list_empty)
+                } else {
+                    statusDisplay?.visibility = View.INVISIBLE
+                }
             }
         }
 
@@ -96,6 +105,7 @@ class InprogressListFragment : Fragment() {
                 val headers = HashMap<String, String>()
                 headers["Authorization"] = "Bearer " + AppSettings.getToken()
                 headers["Content-Type"] = "application/json"
+                headers["Accept"] = "application/json"
                 return headers
             }
         }
@@ -104,8 +114,10 @@ class InprogressListFragment : Fragment() {
     }
 
     companion object {
-        fun newInstance(param1: String): InprogressListFragment {
-            val fragment = InprogressListFragment()
+        private const val TO_SHOW = "param1"
+
+        fun newInstance(param1: String): ListFragment {
+            val fragment = ListFragment()
             val args = Bundle()
             args.putString(TO_SHOW, param1)
             fragment.arguments = args

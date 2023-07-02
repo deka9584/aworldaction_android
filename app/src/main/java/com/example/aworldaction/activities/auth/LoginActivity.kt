@@ -90,6 +90,12 @@ class LoginActivity : AppCompatActivity() {
                 params["password"] = password
                 return params
             }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Accept"] = "application/json"
+                return headers
+            }
         }
         requestQueue.add(request)
     }

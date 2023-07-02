@@ -6,20 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".activities.MainActivity">
 
+
     <FrameLayout
         android:id="@+id/fragmentContainer"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottom_nav_area"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/bottom_nav_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="@color/light_gray"
+        android:paddingTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
@@ -34,8 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_access_time_24"
-                android:paddingTop="4dp"/>
+                android:src="@drawable/ic_baseline_access_time_24"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -56,8 +58,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_star_border_24"
-                android:paddingTop="4dp"/>
+                android:src="@drawable/ic_baseline_star_border_24"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -78,8 +79,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_done_all_24"
-                android:paddingTop="4dp"/>
+                android:src="@drawable/ic_baseline_done_all_24"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/list_completed"
+                android:textAlignment="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/accountBtn"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_baseline_account_circle_24"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"

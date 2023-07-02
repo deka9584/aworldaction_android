@@ -10,7 +10,8 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.auth.WelcomeActivity
-import com.example.aworldaction.activities.fragments.InprogressListFragment
+import com.example.aworldaction.activities.fragments.AccountFragment
+import com.example.aworldaction.activities.fragments.ListFragment
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
@@ -25,13 +26,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             checkAuth()
         }
-
-        // val logoutBtn: Button? = findViewById(R.id.logoutBtn)
-        // logoutBtn?.setOnClickListener {
-        //    AppSettings.removeToken()
-        //    val intent = Intent(this, WelcomeActivity::class.java)
-        //    startActivity(intent)
-        // }
     }
 
     private fun checkAuth() {
@@ -64,6 +58,7 @@ class MainActivity : AppCompatActivity() {
                 val headers = HashMap<String, String>()
                 headers["Authorization"] = "Bearer " + AppSettings.getToken()
                 headers["Content-Type"] = "application/json"
+                headers["Accept"] = "application/json"
                 return headers
             }
         }
@@ -71,40 +66,48 @@ class MainActivity : AppCompatActivity() {
         requestQueue.add(request)
     }
 
-    private fun showWelcomeView() {
-        val intent = Intent(this, WelcomeActivity::class.java)
-        startActivity(intent)
-    }
-
-    private fun showCampaignList() {
+    fun showCampaignList() {
         val inprogressBtn: LinearLayout? = findViewById(R.id.inprogressBtn)
         val favouritesBtn: LinearLayout? = findViewById(R.id.favouritesBtn)
         val completedBtn: LinearLayout? = findViewById(R.id.completedBtn)
+        val accountBtn: LinearLayout? = findViewById(R.id.accountBtn)
 
         inprogressBtn?.setOnClickListener {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragmentContainer, InprogressListFragment.newInstance("inprogress"))
+                .replace(R.id.fragmentContainer, ListFragment.newInstance("inprogress"))
                 .commit()
         }
 
         favouritesBtn?.setOnClickListener {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragmentContainer, InprogressListFragment.newInstance("favourites"))
+                .replace(R.id.fragmentContainer, ListFragment.newInstance("favourites"))
                 .commit()
         }
 
         completedBtn?.setOnClickListener {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragmentContainer, InprogressListFragment.newInstance("completed"))
+                .replace(R.id.fragmentContainer, ListFragment.newInstance("completed"))
+                .commit()
+        }
+
+        accountBtn?.setOnClickListener {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fragmentContainer, AccountFragment())
                 .commit()
         }
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.fragmentContainer, InprogressListFragment.newInstance("inprogress"))
+            .replace(R.id.fragmentContainer, ListFragment.newInstance("inprogress"))
             .commit()
+    }
+
+    fun showWelcomeView() {
+        val intent = Intent(this, WelcomeActivity::class.java)
+        startActivity(intent)
     }
 }

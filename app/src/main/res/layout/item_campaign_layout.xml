@@ -23,7 +23,7 @@
         style="@style/item_campaign_title_area"
         android:text="Titolo"
         android:textColor="@color/white"
-        android:textSize="40dp"
+        android:textSize="28dp"
         android:textStyle="bold"
         android:paddingHorizontal="24dp"
         android:paddingVertical="8dp"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:text="Descrizione"
         android:padding="24dp"
-        android:textSize="24dp"
+        android:textSize="18dp"
         android:textColor="@color/white"
         />
 

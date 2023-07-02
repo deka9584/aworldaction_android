@@ -21,4 +21,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="detail_btn">More info</string>
+    <string name="list_empty">No campaigns found</string>
+    <string name="logout_btn" translatable="false">Logout</string>
+    <string name="account">Your Account</string>
 </resources>
