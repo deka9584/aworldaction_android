@@ -14,4 +14,11 @@
     <string name="register_step_2">Create a safe password</string>
     <string name="confirm_passsword_hint">Confirm password</string>
     <string name="upload_profile_photo">Upload a profile photo</string>
+    <string name="password_cofirm_hint">Password Confirm</string>
+    <string name="list_inprogress">In progress</string>
+    <string name="list_favourites">Favourites</string>
+    <string name="list_completed">Completed</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="detail_btn">More info</string>
 </resources>

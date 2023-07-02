@@ -1,4 +1,4 @@
-package com.example.aworldaction.activities
+package com.example.aworldaction.activities.auth
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

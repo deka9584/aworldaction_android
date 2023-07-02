@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.LoginActivity">
+    tools:context=".activities.auth.LoginActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewTitleArea"
@@ -58,14 +58,14 @@
             android:text="@string/login_btn" />
 
         <TextView
-            android:id="@+id/passRecoveryLink"
-            style="@style/text_link"
-            android:text="@string/pass_recovery_link"/>
+            android:id="@+id/authStatus"
+            style="@style/text_status"
+            android:text="" />
+
         <TextView
             android:id="@+id/newAccountLink"
             style="@style/text_link"
-            android:text="@string/new_account_link"
-            />
+            android:text="@string/new_account_link" />
 
     </LinearLayout>
 

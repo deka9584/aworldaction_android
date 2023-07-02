@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.RegisterActivity">
+    tools:context=".activities.auth.RegisterActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/viewTitleArea"
@@ -50,17 +50,32 @@
             android:hint="@string/register_user_hint"/>
 
         <EditText
-            android:id="@+id/passwordField"
-            style="@style/login_edittext_password"
+            android:id="@+id/emailField"
+            style="@style/login_edittext_user"
             android:hint="@string/register_email_hint"/>
 
+        <EditText
+            android:id="@+id/passwordField"
+            style="@style/login_edittext_password"
+            android:hint="@string/login_password_hint"/>
+
+        <EditText
+            android:id="@+id/passwordConfirmField"
+            style="@style/login_edittext_password"
+            android:hint="@string/password_cofirm_hint"/>
+
         <Button
-            android:id="@+id/loginBtn"
+            android:id="@+id/registerBtn"
             style="@style/login_next_btn"
-            android:text="@string/next" />
+            android:text="@string/register_btn" />
 
         <TextView
-            android:id="@+id/passRecoveryLink"
+            android:id="@+id/authStatus"
+            style="@style/text_status"
+            android:text="" />
+
+        <TextView
+            android:id="@+id/loginLink"
             style="@style/text_link"
             android:text="@string/login_link"/>
 
