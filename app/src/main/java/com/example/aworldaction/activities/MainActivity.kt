@@ -20,15 +20,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         AppSettings.init(this)
-
-        if (AppSettings.getToken() == null) {
-            showWelcomeView()
-        } else {
-            checkAuth()
-        }
+        setupUser()
     }
 
-    private fun checkAuth() {
+    private fun setupUser() {
+        val userToken = AppSettings.getToken()
+
+        if (userToken == null || userToken == "") {
+            showWelcomeView()
+            return
+        }
+
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser"
 
