@@ -34,14 +34,14 @@ class MainActivity : AppCompatActivity() {
         val registerBtn: Button = findViewById(R.id.registerBtn)
 
         loginBtn.setOnClickListener {
-            if (progressBar?.isVisible == false) {
+            if (progressBar?.visibility == View.INVISIBLE) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
 
         registerBtn.setOnClickListener {
-            if (progressBar?.isVisible == false) {
+            if (progressBar?.visibility == View.INVISIBLE) {
                 val intent = Intent(this, RegisterActivity::class.java)
                 startActivity(intent)
             }
@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
+                headers["Authorization"] = "Bearer $userToken"
                 headers["Content-Type"] = "application/json"
                 headers["Accept"] = "application/json"
                 return headers

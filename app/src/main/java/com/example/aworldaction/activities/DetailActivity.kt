@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,8 @@ class DetailActivity : AppCompatActivity() {
     private var titleDisplay: TextView? = null
     private var localityDisplay: TextView? = null
     private var descriptionDisplay: TextView? = null
+    private var statusImgDisplay: ImageView? = null
+    private var statusTxtDisplay: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,9 @@ class DetailActivity : AppCompatActivity() {
         titleDisplay = findViewById(R.id.campaignTitle)
         localityDisplay = findViewById(R.id.localityDisplay)
         descriptionDisplay = findViewById(R.id.descriptionDisplay)
+
+        statusImgDisplay = findViewById(R.id.statusImgDisplay)
+        statusTxtDisplay = findViewById(R.id.statusTxtDisplay)
 
         val campaingId = intent.getIntExtra("campaignId", 0)
         if (campaingId != 0) {
@@ -107,18 +113,42 @@ class DetailActivity : AppCompatActivity() {
         val contributorAdapter = ContributorAdapter(contributors, this)
         contributorsDisplay?.adapter = contributorAdapter
 
-        titleDisplay?.text = campaign?.getString("name")
-        localityDisplay?.text = campaign?.getString("location_name")
-        descriptionDisplay?.text = campaign?.getString("description")
+        campaign?.let { campaign ->
+            if (campaign.has("name")) {
+                titleDisplay?.text = campaign.getString("name")
+            }
 
-        val lat = campaign?.getDouble("location_lat")
-        val lng = campaign?.getDouble("location_lng")
+            if (campaign.has("location_name")) {
+                localityDisplay?.text = campaign.getString("location_name")
+            }
 
-        if (lat != null && lng != null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.mapsFragment, MapsFragment.newInstance(lat, lng))
-                .commit()
+            if (campaign.has("description")) {
+                descriptionDisplay?.text = campaign.getString("description")
+            }
+
+            if (campaign.has("location_lat") || campaign.has("location_lng")) {
+                val lat = campaign.getDouble("location_lat")
+                val lng = campaign.getDouble("location_lng")
+
+                supportFragmentManager
+                    .beginTransaction()
+                    .replace(R.id.mapsFragment, MapsFragment.newInstance(lat, lng))
+                    .commit()
+            }
+
+            if (campaign.has("completed")) {
+                if (campaign.getInt("completed") == 1) {
+                    statusImgDisplay?.setImageResource(R.drawable.ic_baseline_done_all_24)
+                    statusImgDisplay?.setColorFilter(resources.getColor(R.color.green, theme))
+                    statusTxtDisplay?.text = resources.getString(R.string.campaign_completed)
+                    statusTxtDisplay?.setTextColor(resources.getColor(R.color.green, theme))
+                } else {
+                    statusImgDisplay?.setImageResource(R.drawable.ic_baseline_access_time_24)
+                    statusImgDisplay?.setColorFilter(resources.getColor(R.color.orange, theme))
+                    statusTxtDisplay?.text = resources.getString(R.string.campaign_inprogress)
+                    statusTxtDisplay?.setTextColor(resources.getColor(R.color.orange, theme))
+                }
+            }
         }
     }
 }

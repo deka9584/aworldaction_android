@@ -28,4 +28,6 @@
     <string name="login_failed">Invalid username or password</string>
     <string name="registration_failed">Registration failed</string>
     <string name="contributor_list">Contributors</string>
+    <string name="campaign_completed">Completed</string>
+    <string name="campaign_inprogress">In progress</string>
 </resources>

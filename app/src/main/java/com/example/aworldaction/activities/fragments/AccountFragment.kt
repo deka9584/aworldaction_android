@@ -53,9 +53,14 @@ class AccountFragment : Fragment() {
     private fun displayUser() {
         val user = AppSettings.getUser()
 
+        if (user == null) {
+            Log.w("token", "User is null: ${AppSettings.getToken()}")
+            return
+        }
+
         nameDisplay?.text = user?.getString("name")
 
-        if (user?.has("picture_path") == true) {
+        if (user.has("picture_path")) {
             val url = AppSettings.getStorageUrl(user.getString("picture_path"))
 
             pictureDisplay?.let {
@@ -101,7 +106,7 @@ class AccountFragment : Fragment() {
 
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + userToken
+                headers["Authorization"] = "Bearer $userToken"
                 headers["Content-Type"] = "application/json"
                 headers["Accept"] = "application/json"
                 return headers

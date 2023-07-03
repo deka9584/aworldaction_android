@@ -94,7 +94,6 @@ class RegisterActivity : AppCompatActivity() {
                     val jsonResponse = JSONObject(responseString)
                     val errorMessage = jsonResponse.getString("message")
                     authStatus?.text = errorMessage
-                    authStatus?.setTextColor(Color.parseColor("#FF0000"))
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     authStatus?.text = resources.getString(R.string.registration_failed)

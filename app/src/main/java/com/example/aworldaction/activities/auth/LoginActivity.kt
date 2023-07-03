@@ -76,6 +76,7 @@ class LoginActivity : AppCompatActivity() {
             if (responseJSON.has("message")) {
                 val message = responseJSON.getString("message")
                 authStatus?.text = message
+                authStatus?.setTextColor(resources.getColor(R.color.green, theme))
             }
 
             progressBar?.visibility = View.INVISIBLE
@@ -86,7 +87,7 @@ class LoginActivity : AppCompatActivity() {
 
             if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
                 authStatus?.text = resources.getString(R.string.login_failed)
-                authStatus?.setTextColor(Color.parseColor("#FF0000"))
+                authStatus?.setTextColor(resources.getColor(R.color.red, theme))
             }
 
             progressBar?.visibility = View.INVISIBLE

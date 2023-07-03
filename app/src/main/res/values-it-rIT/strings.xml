@@ -22,4 +22,6 @@
     <string name="login_failed">Credenziali non valide</string>
     <string name="registration_failed">Registrazione fallita</string>
     <string name="contributor_list">Partecipanti</string>
+    <string name="campaign_completed">Completata</string>
+    <string name="campaign_inprogress">In corso</string>
 </resources>
