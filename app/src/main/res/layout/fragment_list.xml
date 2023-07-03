@@ -45,11 +45,18 @@
                 android:textSize="18dp"
                 android:text=""/>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/campaignList"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/campaignList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
         </RelativeLayout>
 

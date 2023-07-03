@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.fragments.MapsFragment
+import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
@@ -18,7 +21,9 @@ import org.json.JSONObject
 class DetailActivity : AppCompatActivity() {
     private var campaign: JSONObject? = null
     private var pictures = ArrayList<JSONObject>()
+    private var contributors = ArrayList<JSONObject>()
     private var picutresDisplay: ViewPager? = null
+    private var contributorsDisplay: RecyclerView? = null
     private var titleDisplay: TextView? = null
     private var localityDisplay: TextView? = null
     private var descriptionDisplay: TextView? = null
@@ -28,6 +33,11 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
 
         picutresDisplay = findViewById(R.id.picturesDisplay)
+
+        contributorsDisplay = findViewById(R.id.contributorList)
+        contributorsDisplay?.layoutManager = LinearLayoutManager(this)
+        contributorsDisplay?.adapter = ContributorAdapter(contributors, this)
+
         titleDisplay = findViewById(R.id.campaignTitle)
         localityDisplay = findViewById(R.id.localityDisplay)
         descriptionDisplay = findViewById(R.id.descriptionDisplay)
@@ -60,6 +70,13 @@ class DetailActivity : AppCompatActivity() {
                     }
                 }
 
+                val contributors = campaign?.getJSONArray("contributors")
+                contributors.let {
+                    for (i in 0 until contributors!!.length()) {
+                        this.contributors.add(contributors.getJSONObject(i))
+                    }
+                }
+
                 showCampaignData()
             }
         }
@@ -84,8 +101,11 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showCampaignData() {
-        val adapter = SlideshowAdapter(pictures, this)
-        picutresDisplay?.adapter = adapter
+        val slideshowAdapter = SlideshowAdapter(pictures, this)
+        picutresDisplay?.adapter = slideshowAdapter
+
+        val contributorAdapter = ContributorAdapter(contributors, this)
+        contributorsDisplay?.adapter = contributorAdapter
 
         titleDisplay?.text = campaign?.getString("name")
         localityDisplay?.text = campaign?.getString("location_name")

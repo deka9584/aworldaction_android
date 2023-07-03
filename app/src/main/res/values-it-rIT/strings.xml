@@ -19,4 +19,7 @@
     <string name="list_empty">Nessuna campagna trovata</string>
     <string name="account">Il tuo account</string>
     <string name="detail_title">Dettagli</string>
+    <string name="login_failed">Credenziali non valide</string>
+    <string name="registration_failed">Registrazione fallita</string>
+    <string name="contributor_list">Partecipanti</string>
 </resources>

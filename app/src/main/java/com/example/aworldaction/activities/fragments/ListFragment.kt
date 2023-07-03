@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -45,6 +46,12 @@ class ListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+            loadList()
+            swipeRefreshLayout.isRefreshing = false
+        }
+
         statusDisplay = view.findViewById(R.id.statusDisplay)
 
         recyclerView = view.findViewById(R.id.campaignList)
@@ -56,7 +63,7 @@ class ListFragment : Fragment() {
             "inprogress" -> resources.getString(R.string.list_inprogress)
             "favourites" -> resources.getString(R.string.list_favourites)
             "completed" -> resources.getString(R.string.list_completed)
-            else -> return
+            else -> "List"
         }
     }
 

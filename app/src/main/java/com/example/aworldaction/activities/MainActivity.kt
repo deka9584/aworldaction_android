@@ -4,8 +4,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.isVisible
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -16,6 +19,8 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
+    private var progressBar: ProgressBar? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -23,17 +28,23 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         AppSettings.init(this)
 
+        progressBar = findViewById(R.id.progressBar)
+
         val loginBtn: Button = findViewById(R.id.loginBtn)
         val registerBtn: Button = findViewById(R.id.registerBtn)
 
         loginBtn.setOnClickListener {
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            if (progressBar?.isVisible == false) {
+                val intent = Intent(this, LoginActivity::class.java)
+                startActivity(intent)
+            }
         }
 
         registerBtn.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            if (progressBar?.isVisible == false) {
+                val intent = Intent(this, RegisterActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
@@ -42,7 +53,7 @@ class MainActivity : AppCompatActivity() {
         setupUser()
     }
 
-    fun showHomeActivity() {
+    private fun showHomeActivity() {
         val intent = Intent(this, HomeActivity::class.java)
         startActivity(intent)
     }
@@ -62,16 +73,18 @@ class MainActivity : AppCompatActivity() {
 
             if (responseJSON.has("user")) {
                 val user = responseJSON.getJSONObject("user")
+
                 AppSettings.setUser(user)
                 Log.d("user", user.toString())
                 showHomeActivity()
             }
+
+            progressBar?.visibility = View.INVISIBLE
         }
 
         val errorListener = Response.ErrorListener { error ->
+            progressBar?.visibility = View.INVISIBLE
             Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-
             AppSettings.setToken(null)
         }
 
@@ -87,6 +100,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        progressBar?.visibility = View.VISIBLE
         requestQueue.add(request)
     }
 }

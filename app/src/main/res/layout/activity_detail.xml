@@ -101,6 +101,21 @@
                     android:text="Description"
                     android:textSize="18dp"/>
             </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/contributor_list"
+                android:textAlignment="center"
+                android:textSize="24dp"
+                android:layout_marginVertical="24dp"
+                />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/contributorList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
         </LinearLayout>
     </ScrollView>
 

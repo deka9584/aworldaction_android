@@ -4,10 +4,13 @@ import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.view.isVisible
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -17,6 +20,7 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
+    private var progressBar: ProgressBar? = null
     private var emailField: EditText? = null
     private var passwordField: EditText? = null
     private var authStatus: TextView? = null
@@ -25,6 +29,7 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        progressBar = findViewById(R.id.progressBar)
         authStatus = findViewById(R.id.authStatus)
         emailField = findViewById(R.id.userField)
         passwordField = findViewById(R.id.passwordField)
@@ -36,12 +41,14 @@ class LoginActivity : AppCompatActivity() {
 
         val loginBtn: Button? = findViewById(R.id.loginBtn)
         loginBtn?.setOnClickListener {
-            val email = emailField?.text.toString()
-            val password = passwordField?.text.toString()
+            if (progressBar?.visibility == View.INVISIBLE) {
+                val email = emailField?.text.toString()
+                val password = passwordField?.text.toString()
 
-            if (email != "" && password != "") {
-                sendLoginRequest(email, password)
-                resetFields()
+                if (email != "" && password != "") {
+                    sendLoginRequest(email, password)
+                    resetFields()
+                }
             }
         }
     }
@@ -68,18 +75,21 @@ class LoginActivity : AppCompatActivity() {
 
             if (responseJSON.has("message")) {
                 val message = responseJSON.getString("message")
-                this.authStatus?.text = message
+                authStatus?.text = message
             }
+
+            progressBar?.visibility = View.INVISIBLE
         }
 
         val errorListener = Response.ErrorListener { error ->
             Log.e("serverAPI", error.toString())
 
-            if (error.networkResponse.statusCode == 401) {
-                val authStatusText = findViewById<TextView>(R.id.authStatus)
-                authStatusText.text = "Invalid email or password"
-                authStatusText.setTextColor(Color.parseColor("#FF0000"))
+            if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
+                authStatus?.text = resources.getString(R.string.login_failed)
+                authStatus?.setTextColor(Color.parseColor("#FF0000"))
             }
+
+            progressBar?.visibility = View.INVISIBLE
         }
 
         val request = object : StringRequest(
@@ -98,6 +108,8 @@ class LoginActivity : AppCompatActivity() {
                 return headers
             }
         }
+
+        progressBar?.visibility = View.VISIBLE
         requestQueue.add(request)
     }
 

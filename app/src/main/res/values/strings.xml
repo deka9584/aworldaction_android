@@ -25,4 +25,7 @@
     <string name="logout_btn" translatable="false">Logout</string>
     <string name="account">Your Account</string>
     <string name="detail_title">Details</string>
+    <string name="login_failed">Invalid username or password</string>
+    <string name="registration_failed">Registration failed</string>
+    <string name="contributor_list">Contributors</string>
 </resources>
