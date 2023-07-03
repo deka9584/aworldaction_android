@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
@@ -12,9 +13,12 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
+import com.example.aworldaction.activities.fragments.ListFragment
+import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.adapters.CampaignAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
 import com.example.aworldaction.settings.AppSettings
+import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 
 class DetailActivity : AppCompatActivity() {
@@ -92,5 +96,15 @@ class DetailActivity : AppCompatActivity() {
         titleDisplay?.text = campaign?.getString("name")
         localityDisplay?.text = campaign?.getString("location_name")
         descriptionDisplay?.text = campaign?.getString("description")
+
+        val lat = campaign?.getDouble("location_lat")
+        val lng = campaign?.getDouble("location_lng")
+
+        if (lat != null && lng != null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.mapsFragment, MapsFragment.newInstance(lat, lng))
+                .commit()
+        }
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AworldAction</string>
+    <string name="app_name">AWorldAction</string>
     <string name="login_btn">Accedi</string>
     <string name="register_btn">Registrati</string>
     <string name="next">Avanti ></string>
@@ -18,4 +18,5 @@
     <string name="detail_btn">Maggiori informazioni</string>
     <string name="list_empty">Nessuna campagna trovata</string>
     <string name="account">Il tuo account</string>
+    <string name="detail_title">Dettagli</string>
 </resources>
