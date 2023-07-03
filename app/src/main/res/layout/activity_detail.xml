@@ -55,7 +55,8 @@
                 android:text="@string/detail_title"
                 android:textAlignment="center"
                 android:textSize="24dp"
-                android:layout_marginVertical="24dp"/>
+                android:layout_marginVertical="24dp"
+                />
 
             <FrameLayout
                 android:id="@+id/mapsFragment"
@@ -67,7 +68,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginVertical="24dp">
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -84,14 +86,21 @@
                     android:textSize="24dp"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/descriptionDisplay"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="24dp"
-                android:layout_marginBottom="24dp"
-                android:text="Description"
-                android:textSize="18dp"/>
+                android:orientation="vertical"
+                android:layout_margin="12dp"
+                android:padding="24dp"
+                android:background="@drawable/rounded_box">
+
+                <TextView
+                    android:id="@+id/descriptionDisplay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Description"
+                    android:textSize="18dp"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 

@@ -14,19 +14,19 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.MainActivity
+import com.example.aworldaction.activities.HomeActivity
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
 class AccountFragment : Fragment() {
-    private var mainActivity: MainActivity? = null
+    private var homeActivity: HomeActivity? = null
     private var nameDisplay: TextView? = null
     private var pictureDisplay: ImageView? = null
     private var logoutBtn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mainActivity = requireActivity() as? MainActivity
+        homeActivity = requireActivity() as? HomeActivity
     }
 
     override fun onCreateView(
@@ -44,6 +44,7 @@ class AccountFragment : Fragment() {
         logoutBtn = view.findViewById(R.id.logoutBtn)
 
         displayUser()
+
         logoutBtn?.setOnClickListener {
             logout()
         }
@@ -58,14 +59,24 @@ class AccountFragment : Fragment() {
             val url = AppSettings.getStorageUrl(user.getString("picture_path"))
 
             pictureDisplay?.let {
-                Glide.with(requireContext())
-                    .load(url)
-                    .into(pictureDisplay!!)
+                if (url != null) {
+                    Glide.with(requireContext())
+                        .load(url)
+                        .into(pictureDisplay!!)
+                } else {
+                    pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
+                }
             }
         }
     }
 
     private fun logout() {
+        val userToken = AppSettings.getToken()
+
+        if (userToken == null || userToken == "") {
+            homeActivity?.finish()
+        }
+
         val requestQueue = Volley.newRequestQueue(this.context)
         val url = AppSettings.getAPIUrl().toString() + "/logout"
 
@@ -77,7 +88,7 @@ class AccountFragment : Fragment() {
             }
 
             AppSettings.removeToken()
-            mainActivity?.showWelcomeView()
+            homeActivity?.finish()
         }
 
         val errorListener = Response.ErrorListener { error ->
@@ -90,7 +101,7 @@ class AccountFragment : Fragment() {
 
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
+                headers["Authorization"] = "Bearer " + userToken
                 headers["Content-Type"] = "application/json"
                 headers["Accept"] = "application/json"
                 return headers

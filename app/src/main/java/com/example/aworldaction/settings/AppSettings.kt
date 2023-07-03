@@ -3,14 +3,16 @@ package com.example.aworldaction.settings
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import org.json.JSONObject
+import java.net.MalformedURLException
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
 object AppSettings {
     private val apiUrl = URL("https://aworldaction.zapto.org/api")
-    private lateinit var preferences: SharedPreferences
+    private var preferences: SharedPreferences? = null
     private var user: JSONObject? = null
 
     fun init(context: Context) {
@@ -21,26 +23,26 @@ object AppSettings {
         return apiUrl
     }
 
-    fun getPreferences(): SharedPreferences {
+    fun getPreferences(): SharedPreferences? {
         return preferences
     }
 
     fun getToken(): String? {
-        return preferences.getString("token", null)
+        return preferences?.getString("token", null)
     }
 
     fun setToken(token: String?) {
-        val editor = preferences.edit()
+        val editor = preferences?.edit()
 
-        editor.putString("token", token)
-        editor.apply()
+        editor?.putString("token", token)
+        editor?.apply()
     }
 
     fun removeToken() {
-        val editor = preferences.edit()
+        val editor = preferences?.edit()
 
-        editor.remove("token")
-        editor.apply()
+        editor?.remove("token")
+        editor?.apply()
     }
 
     fun getUser(): JSONObject? {
@@ -54,7 +56,14 @@ object AppSettings {
     fun getStorageUrl(path: String): URL? {
         val serverUrl = apiUrl.toString().replace("api", "storage")
         val newUrl = path.replace("public", serverUrl)
-        return URL(newUrl)
+
+        try {
+            return URL(newUrl)
+        } catch (error: MalformedURLException) {
+            error.printStackTrace()
+        }
+
+        return null
     }
 
     fun formatDateString(dateString: String): String {

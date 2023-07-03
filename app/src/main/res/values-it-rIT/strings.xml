@@ -15,7 +15,7 @@
     <string name="list_inprogress">In corso</string>
     <string name="list_favourites">Preferiti</string>
     <string name="list_completed">Completate</string>
-    <string name="detail_btn">Maggiori informazioni</string>
+    <string name="detail_btn">Dettagli</string>
     <string name="list_empty">Nessuna campagna trovata</string>
     <string name="account">Il tuo account</string>
     <string name="detail_title">Dettagli</string>
