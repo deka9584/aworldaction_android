@@ -1,5 +1,6 @@
 package com.example.aworldaction.activities.auth
 
+import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -53,6 +54,13 @@ class RegisterActivity : AppCompatActivity() {
                     resetFields()
                 }
             }
+        }
+
+        val loginLink: TextView? = findViewById(R.id.loginLink)
+        loginLink?.setOnClickListener {
+            finish()
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
         }
     }
 
