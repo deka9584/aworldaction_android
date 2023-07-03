@@ -17,7 +17,6 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
 class RegisterActivity : AppCompatActivity() {
-    private var mainActivity: MainActivity? = null
     private var userField: EditText? = null
     private var emailField: EditText? = null
     private var passwordField: EditText? = null
@@ -28,7 +27,6 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        mainActivity = parent as? MainActivity
         userField = findViewById(R.id.userField)
         emailField = findViewById(R.id.emailField)
         passwordField = findViewById(R.id.passwordField)
@@ -71,8 +69,6 @@ class RegisterActivity : AppCompatActivity() {
                 Log.d("token", token)
                 Log.d("user", user.toString())
 
-                mainActivity?.showHomeActivity()
-                Log.d("main", mainActivity.toString())
                 finish()
             }
 
