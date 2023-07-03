@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import org.json.JSONObject
 import java.net.URL
+import java.text.SimpleDateFormat
+import java.util.*
 
 object AppSettings {
     private val apiUrl = URL("https://aworldaction.zapto.org/api")
@@ -53,5 +55,21 @@ object AppSettings {
         val serverUrl = apiUrl.toString().replace("api", "storage")
         val newUrl = path.replace("public", serverUrl)
         return URL(newUrl)
+    }
+
+    fun formatDateString(dateString: String): String {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+        val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+
+        try {
+            val date = inputFormat.parse(dateString)
+            return outputFormat.format(date)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return ""
     }
 }

@@ -3,9 +3,6 @@ package com.example.aworldaction.activities
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
@@ -13,17 +10,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.fragments.ListFragment
 import com.example.aworldaction.activities.fragments.MapsFragment
-import com.example.aworldaction.adapters.CampaignAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
 import com.example.aworldaction.settings.AppSettings
-import com.google.android.gms.maps.model.LatLng
 import org.json.JSONObject
 
 class DetailActivity : AppCompatActivity() {
     private var campaign: JSONObject? = null
-    private var picturesPaths = ArrayList<String>()
+    private var pictures = ArrayList<JSONObject>()
     private var picutresDisplay: ViewPager? = null
     private var titleDisplay: TextView? = null
     private var localityDisplay: TextView? = null
@@ -62,7 +56,7 @@ class DetailActivity : AppCompatActivity() {
                 val pictures = campaign?.getJSONArray("pictures")
                 pictures.let {
                     for (i in 0 until pictures!!.length()) {
-                        picturesPaths.add(pictures.getJSONObject(i).getString("path"))
+                        this.pictures.add(pictures.getJSONObject(i))
                     }
                 }
 
@@ -90,7 +84,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showCampaignData() {
-        val adapter = SlideshowAdapter(picturesPaths, this)
+        val adapter = SlideshowAdapter(pictures, this)
         picutresDisplay?.adapter = adapter
 
         titleDisplay?.text = campaign?.getString("name")

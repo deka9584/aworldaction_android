@@ -8,8 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
@@ -33,7 +31,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_campaign_layout, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.campaign_item, parent, false)
         return ViewHolder(view)
     }
 

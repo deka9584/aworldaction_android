@@ -1,11 +1,14 @@
 package com.example.aworldaction.activities.fragments
 
+import android.content.Intent
+import android.net.Uri
 import androidx.fragment.app.Fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.example.aworldaction.R
@@ -35,14 +38,26 @@ class MapsFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
         ): View? {
-        val view = inflater.inflate(R.layout.fragment_maps, container, false)
+        return inflater.inflate(R.layout.fragment_maps, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         webView = view.findViewById(R.id.mapWebView)
         webView?.settings?.javaScriptEnabled = true
-        webView?.webViewClient = WebViewClient()
+        webView?.webViewClient = object:  WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                val url = request?.url?.toString()
+                if (url != null) {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    startActivity(intent)
+                    return true
+                }
+                return super.shouldOverrideUrlLoading(view, request)
+            }
+        }
         loadMap()
-
-        return view
     }
 
     private fun loadMap() {
@@ -58,7 +73,9 @@ class MapsFragment : Fragment() {
                     </style>
                 </head>
                 <body>
-                    <iframe src="${baseUrl}" width="100%" height="300" frameborder="0" style="border:0" allowfullscreen></iframe>
+                    <iframe
+                        src="${baseUrl}" width="100%" height="300" frameborder="0" scrolling="no" style="border:0" allowfullscreen>
+                    </iframe>
                 </body>
             </html>
         """.trimIndent()
