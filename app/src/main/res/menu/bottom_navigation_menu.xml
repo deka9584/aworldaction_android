@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_inprogress"
+        android:title="@string/list_inprogress"
+        android:icon="@drawable/ic_baseline_access_time_24" />
+
+    <item
+        android:id="@+id/menu_favourites"
+        android:title="@string/list_favourites"
+        android:icon="@drawable/ic_baseline_star_24" />
+
+    <item
+        android:id="@+id/menu_completed"
+        android:title="@string/list_completed"
+        android:icon="@drawable/ic_baseline_done_all_24" />
+
+    <item
+        android:id="@+id/menu_profile"
+        android:title="@string/account"
+        android:icon="@drawable/ic_baseline_account_circle_24" />
+</menu>

@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showHomeActivity() {
         val intent = Intent(this, HomeActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
     }
 

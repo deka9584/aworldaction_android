@@ -2,13 +2,11 @@ package com.example.aworldaction.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.ActionMode
-import android.widget.LinearLayout
+import androidx.fragment.app.Fragment
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.fragments.AccountFragment
 import com.example.aworldaction.activities.fragments.ListFragment
-import com.example.aworldaction.settings.AppSettings
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,47 +17,44 @@ class HomeActivity : AppCompatActivity() {
         val favouritesFragment = ListFragment.newInstance("favourites")
         val completedFragment = ListFragment.newInstance("completed")
         val accountFragment = AccountFragment()
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        val inprogressBtn: LinearLayout? = findViewById(R.id.inprogressBtn)
-        val favouritesBtn: LinearLayout? = findViewById(R.id.favouritesBtn)
-        val completedBtn: LinearLayout? = findViewById(R.id.completedBtn)
-        val accountBtn: LinearLayout? = findViewById(R.id.accountBtn)
-
-        inprogressBtn?.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, inProgressFragment)
-                .commit()
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.menu_inprogress -> {
+                    switchFragment(inProgressFragment)
+                    return@setOnItemSelectedListener true
+                }
+                R.id.menu_favourites -> {
+                    switchFragment(favouritesFragment)
+                    return@setOnItemSelectedListener true
+                }
+                R.id.menu_completed -> {
+                    supportFragmentManager
+                        .beginTransaction()
+                        .replace(R.id.fragmentContainer, completedFragment)
+                        .commit()
+                    return@setOnItemSelectedListener true
+                }
+                R.id.menu_profile -> {
+                    switchFragment(accountFragment)
+                    return@setOnItemSelectedListener true
+                }
+                else -> return@setOnItemSelectedListener false
+            }
         }
 
-        favouritesBtn?.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, favouritesFragment)
-                .commit()
-        }
-
-        completedBtn?.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, completedFragment)
-                .commit()
-        }
-
-        accountBtn?.setOnClickListener {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fragmentContainer, accountFragment)
-                .commit()
-        }
-
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragmentContainer, inProgressFragment)
-            .commit()
+        switchFragment(inProgressFragment)
     }
 
     override fun onBackPressed() {
         finishAffinity()
+    }
+
+    private fun switchFragment(fragment: Fragment) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .commit()
     }
 }
