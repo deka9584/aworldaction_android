@@ -30,45 +30,90 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingVertical="24dp"
-        android:paddingHorizontal="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewTitleArea">
 
-        <TextView
-            style="@style/sub_head"
-            android:text="@string/campaign_title" />
-
-        <EditText
-            android:id="@+id/titleField"
-            style="@style/campaign_title_edittext"/>
-
-        <TextView
-            style="@style/sub_head"
-            android:layout_marginTop="12dp"
-            android:text="@string/campaign_caption" />
-
-        <EditText
-            android:id="@+id/captionField"
-            style="@style/campaign_caption_edittext"/>
-
-        <Button
-            android:id="@+id/submitBtn"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/campaign_submit"
-            android:layout_marginTop="12dp"/>
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingVertical="24dp"
+            android:paddingHorizontal="12dp">
 
-        <TextView
-            android:id="@+id/authStatus"
-            style="@style/text_status"
-            android:text="" />
-    </LinearLayout>
+            <TextView
+                style="@style/sub_head"
+                android:text="@string/campaign_title" />
+
+            <EditText
+                android:id="@+id/titleField"
+                style="@style/campaign_title_edittext"/>
+
+            <TextView
+                style="@style/sub_head"
+                android:layout_marginTop="12dp"
+                android:text="@string/campaign_caption" />
+
+            <EditText
+                android:id="@+id/captionField"
+                style="@style/campaign_caption_edittext"/>
+
+            <TextView
+                style="@style/sub_head"
+                android:layout_marginTop="12dp"
+                android:text="@string/campaign_location" />
+
+            <FrameLayout
+                android:id="@+id/mapsFragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_margin="8dp"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="12dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:src="@drawable/ic_baseline_location_on_24"
+                    app:tint="@color/black"/>
+
+                <TextView
+                    android:id="@+id/localityDisplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Locality"
+                    android:layout_marginLeft="12dp"
+                    android:textSize="18dp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/submitBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/campaign_submit"
+                android:layout_marginTop="12dp"/>
+
+            <TextView
+                android:id="@+id/authStatus"
+                style="@style/text_status"
+                android:text="" />
+        </LinearLayout>
+    </ScrollView>
 
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/progressBar"

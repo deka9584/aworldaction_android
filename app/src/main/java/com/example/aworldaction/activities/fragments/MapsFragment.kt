@@ -74,7 +74,7 @@ class MapsFragment : Fragment() {
                 </head>
                 <body>
                     <iframe
-                        src="${baseUrl}" width="100%" height="300" frameborder="0" scrolling="no" style="border:0" allowfullscreen>
+                        src="$baseUrl" width="100%" height="300" frameborder="0" scrolling="no" style="border:0" allowfullscreen>
                     </iframe>
                 </body>
             </html>

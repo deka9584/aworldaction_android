@@ -1,8 +1,10 @@
 package com.example.aworldaction.activities
 
+import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -67,22 +69,25 @@ class DetailActivity : AppCompatActivity() {
             val responseJSON = JSONObject(response)
 
             if (responseJSON.has("data")) {
-                campaign = responseJSON.getJSONObject("data")
+                val campaign = responseJSON.getJSONObject("data")
 
-                val pictures = campaign?.getJSONArray("pictures")
-                pictures.let {
+                if (campaign.has("pictures")) {
+                    val pictures = campaign?.getJSONArray("pictures")
+
                     for (i in 0 until pictures!!.length()) {
                         this.pictures.add(pictures.getJSONObject(i))
                     }
                 }
 
-                val contributors = campaign?.getJSONArray("contributors")
-                contributors.let {
+                if (campaign.has("contributors")) {
+                    val contributors = campaign?.getJSONArray("contributors")
+
                     for (i in 0 until contributors!!.length()) {
                         this.contributors.add(contributors.getJSONObject(i))
                     }
                 }
 
+                this.campaign = campaign
                 showCampaignData()
             }
         }
@@ -107,8 +112,13 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun showCampaignData() {
-        val slideshowAdapter = SlideshowAdapter(pictures, this)
-        picutresDisplay?.adapter = slideshowAdapter
+        if (pictures.size > 0) {
+            val slideshowAdapter = SlideshowAdapter(pictures, this)
+            picutresDisplay?.adapter = slideshowAdapter
+            picutresDisplay?.visibility = View.VISIBLE
+        } else {
+            picutresDisplay?.visibility = View.GONE
+        }
 
         val contributorAdapter = ContributorAdapter(contributors, this)
         contributorsDisplay?.adapter = contributorAdapter

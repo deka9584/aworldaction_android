@@ -35,4 +35,7 @@
     <string name="campaign_caption">Campaign caption</string>
     <string name="campaign_submit">Submit campaign</string>
     <string name="new_campaign">New campaign</string>
+    <string name="campaign_location" translatable="false">Location</string>
+    <string name="waiting_locatoin">Waiting for location</string>
+    <string name="unknown_locality">Unknown locality</string>
 </resources>
