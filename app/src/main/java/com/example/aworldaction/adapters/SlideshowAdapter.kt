@@ -25,16 +25,19 @@ class SlideshowAdapter(private val images: List<JSONObject>, private val context
 
     override fun instantiateItem(container: ViewGroup, position: Int): Any {
         val imageJSON = images[position]
-        val imageUrl = AppSettings.getStorageUrl(imageJSON.getString("path"))
         val slideshowItem = View.inflate(context, R.layout.slideshow_item, null)
         val imageView = slideshowItem.findViewById<ImageView>(R.id.imageView)
         val captionDisplay = slideshowItem.findViewById<TextView>(R.id.camptionDisplay)
         val dateDisplay = slideshowItem.findViewById<TextView>(R.id.dateDisplay)
 
-        Glide.with(context)
-            .load(imageUrl)
-            .centerCrop()
-            .into(imageView)
+        if (imageJSON.has("path")) {
+            val imageUrl = AppSettings.getStorageUrl(imageJSON.getString("path"))
+
+            Glide.with(context)
+                .load(imageUrl)
+                .centerCrop()
+                .into(imageView)
+        }
 
         if (imageJSON.has("caption")) {
             captionDisplay.text = imageJSON.getString("caption")
@@ -47,12 +50,7 @@ class SlideshowAdapter(private val images: List<JSONObject>, private val context
 
         imageView.setOnClickListener {
             val infoBox = slideshowItem.findViewById<LinearLayout>(R.id.infoBox)
-
-            if (infoBox.isVisible) {
-                infoBox.visibility = View.INVISIBLE
-            } else {
-                infoBox.visibility = View.VISIBLE
-            }
+            infoBox.visibility = if (infoBox.isVisible) View.INVISIBLE else View.VISIBLE
         }
 
         container.addView(slideshowItem)

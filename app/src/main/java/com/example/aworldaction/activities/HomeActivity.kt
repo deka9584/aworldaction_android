@@ -30,10 +30,7 @@ class HomeActivity : AppCompatActivity() {
                     return@setOnItemSelectedListener true
                 }
                 R.id.menu_completed -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.fragmentContainer, completedFragment)
-                        .commit()
+                    switchFragment(completedFragment)
                     return@setOnItemSelectedListener true
                 }
                 R.id.menu_profile -> {

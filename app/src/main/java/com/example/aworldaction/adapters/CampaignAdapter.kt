@@ -52,10 +52,13 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         if (campaign.has("pictures")) {
             val pictures = campaign.getJSONArray("pictures")
+
             if (pictures.length() > 0) {
                 val firstPicture = pictures.getJSONObject(0)
+
                 if (firstPicture.has("path")) {
                     val url = AppSettings.getStorageUrl(firstPicture.getString("path"))
+
                     Glide.with(context)
                         .load(url)
                         .into(viewHolder.image)
@@ -65,6 +68,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         if (campaign.has("contributors")) {
             val contributors = campaign.getJSONArray("contributors")
+
             for (i in 0 until contributors.length()) {
                 if (contributors.getJSONObject(i).getInt("id") == AppSettings.getUser()?.getInt("id")) {
                     viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
