@@ -113,4 +113,28 @@
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginBottom">10dp</item>
     </style>
+
+    <style name="campaign_title_edittext">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:background">@drawable/text_field_bg</item>
+        <item name="android:hint">@string/campaign_title</item>
+        <item name="android:inputType">text</item>
+    </style>
+
+    <style name="campaign_caption_edittext">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:background">@drawable/text_field_bg</item>
+        <item name="android:hint">@string/campaign_caption</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="maxLines">10</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:scrollbars">vertical</item>
+    </style>
 </resources>

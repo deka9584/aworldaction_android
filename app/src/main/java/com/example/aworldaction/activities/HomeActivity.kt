@@ -1,9 +1,11 @@
 package com.example.aworldaction.activities
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.aworldaction.R
+import com.example.aworldaction.activities.auth.RegisterActivity
 import com.example.aworldaction.activities.fragments.AccountFragment
 import com.example.aworldaction.activities.fragments.ListFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -29,6 +31,10 @@ class HomeActivity : AppCompatActivity() {
                     switchFragment(favouritesFragment)
                     return@setOnItemSelectedListener true
                 }
+                R.id.menu_new_campaign -> {
+                    openCampaignForm()
+                    return@setOnItemSelectedListener false
+                }
                 R.id.menu_completed -> {
                     switchFragment(completedFragment)
                     return@setOnItemSelectedListener true
@@ -53,5 +59,10 @@ class HomeActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
+    }
+
+    private fun openCampaignForm() {
+        val intent = Intent(this, CreateCampaignActivity::class.java)
+        startActivity(intent)
     }
 }

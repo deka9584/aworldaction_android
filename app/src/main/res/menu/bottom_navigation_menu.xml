@@ -10,6 +10,12 @@
         android:icon="@drawable/ic_baseline_star_24" />
 
     <item
+        android:id="@+id/menu_new_campaign"
+        android:title="@string/new_campaign"
+        android:icon="@drawable/ic_baseline_add_24"
+        />
+
+    <item
         android:id="@+id/menu_completed"
         android:title="@string/list_completed"
         android:icon="@drawable/ic_baseline_done_all_24" />

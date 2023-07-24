@@ -3,7 +3,7 @@
     <string name="login_btn">Login</string>
     <string name="register_btn">Register</string>
     <string name="next">Next ></string>
-    <string name="login_user_hint" translatable="false">Username / E-Mail</string>
+    <string name="login_user_hint" translatable="false">E-Mail</string>
     <string name="login_password_hint" translatable="false">Password</string>
     <string name="pass_recovery_link"><u>Password recovery</u></string>
     <string name="new_account_link"><u>Create new account</u></string>
@@ -30,4 +30,9 @@
     <string name="contributor_list">Contributors</string>
     <string name="campaign_completed">Completed</string>
     <string name="campaign_inprogress">In progress</string>
+    <string name="create_campaign">Create campaign</string>
+    <string name="campaign_title">Campaign title</string>
+    <string name="campaign_caption">Campaign caption</string>
+    <string name="campaign_submit">Submit campaign</string>
+    <string name="new_campaign">New campaign</string>
 </resources>

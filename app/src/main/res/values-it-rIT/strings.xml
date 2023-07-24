@@ -24,4 +24,9 @@
     <string name="contributor_list">Partecipanti</string>
     <string name="campaign_completed">Completata</string>
     <string name="campaign_inprogress">In corso</string>
+    <string name="create_campaign">Crea campagna</string>
+    <string name="campaign_title">Titolo campagna</string>
+    <string name="campaign_caption">Descrizione campagna</string>
+    <string name="campaign_submit">Pubblica campagna</string>
+    <string name="new_campaign">Nuova campagna</string>
 </resources>
