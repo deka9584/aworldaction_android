@@ -31,4 +31,7 @@
     <string name="new_campaign">Nuova campagna</string>
     <string name="waiting_locatoin">In attesa della posizione attuale</string>
     <string name="unknown_locality">Località sconosciuta</string>
+    <string name="upload">Carica</string>
+    <string name="picker_gallery">Scegli foto</string>
+    <string name="upload_failed">Upload fallito</string>
 </resources>

@@ -2,6 +2,7 @@ package com.example.aworldaction.activities
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.*
 import androidx.appcompat.app.AppCompatActivity
@@ -150,7 +151,15 @@ class CreateCampaignActivity : AppCompatActivity() {
         val listener = Response.Listener<String> { response ->
             val responseJSON = JSONObject(response)
 
-            if (responseJSON.has("campaign") || responseJSON.has("data")) {
+            if (responseJSON.has("campaign")) {
+                val campaign = responseJSON.getJSONObject("campaign")
+
+                if (campaign.has("id")) {
+                    val intent = Intent(this, DetailActivity::class.java)
+                    intent.putExtra("campaignId", campaign.getInt("id"))
+                    startActivity(intent)
+                }
+
                 finish()
             }
 

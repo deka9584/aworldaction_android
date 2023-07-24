@@ -55,9 +55,9 @@ class LoginActivity : AppCompatActivity() {
 
         val newAccountLink: TextView? = findViewById(R.id.newAccountLink)
         newAccountLink?.setOnClickListener {
-            finish()
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 

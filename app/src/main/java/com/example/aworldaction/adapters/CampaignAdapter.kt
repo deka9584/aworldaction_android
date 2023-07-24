@@ -25,6 +25,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView
         val title: TextView
+        val locality: TextView
         val description: TextView
         val detailBtn: Button
         val favouritesBtn: ImageButton
@@ -32,6 +33,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         init {
             title = view.findViewById(R.id.campaignTitle)
+            locality = view.findViewById(R.id.localityDisplay)
             description = view.findViewById(R.id.description)
             image = view.findViewById(R.id.campaignPicture)
             detailBtn = view.findViewById(R.id.detailBtn)
@@ -47,8 +49,18 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val campaign = dataSet[position]
-        viewHolder.title.text = campaign.getString("name")
-        viewHolder.description.text = campaign.getString("description")
+
+        if (campaign.has("name")) {
+            viewHolder.title.text = campaign.getString("name")
+        }
+
+        if (campaign.has("location_name")) {
+            viewHolder.locality.text = campaign.getString("location_name")
+        }
+
+        if (campaign.has("description")) {
+            viewHolder.description.text = campaign.getString("description")
+        }
 
         if (campaign.has("pictures")) {
             val pictures = campaign.getJSONArray("pictures")
@@ -78,7 +90,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         viewHolder.detailBtn.setOnClickListener {
             val intent = Intent(context, DetailActivity::class.java)
-            intent.putExtra("campaignId", campaign.getInt("id")) // Aggiungi il dato all'Intent con una chiave e un valore
+            intent.putExtra("campaignId", campaign.getInt("id"))
             context.startActivity(intent)
         }
 

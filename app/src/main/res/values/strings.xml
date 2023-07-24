@@ -13,7 +13,7 @@
     <string name="login_link"><u>I have already an account</u></string>
     <string name="register_step_2">Create a safe password</string>
     <string name="confirm_passsword_hint">Confirm password</string>
-    <string name="upload_profile_photo">Upload a profile photo</string>
+    <string name="upload_profile_photo">Upload a profile picture</string>
     <string name="password_cofirm_hint">Password Confirm</string>
     <string name="list_inprogress">In progress</string>
     <string name="list_favourites">Favourites</string>
@@ -38,4 +38,7 @@
     <string name="campaign_location" translatable="false">Location</string>
     <string name="waiting_locatoin">Waiting for location</string>
     <string name="unknown_locality">Unknown locality</string>
+    <string name="upload">Upload</string>
+    <string name="picker_gallery">Select picture</string>
+    <string name="upload_failed">Upload failed</string>
 </resources>

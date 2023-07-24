@@ -58,9 +58,9 @@ class RegisterActivity : AppCompatActivity() {
 
         val loginLink: TextView? = findViewById(R.id.loginLink)
         loginLink?.setOnClickListener {
-            finish()
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 

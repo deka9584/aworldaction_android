@@ -1,5 +1,6 @@
 package com.example.aworldaction.activities.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -14,7 +15,9 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.activities.DetailActivity
 import com.example.aworldaction.activities.HomeActivity
+import com.example.aworldaction.activities.UploadPhotoProfileActivity
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
@@ -43,11 +46,16 @@ class AccountFragment : Fragment() {
         pictureDisplay = view.findViewById(R.id.userPicture)
         logoutBtn = view.findViewById(R.id.logoutBtn)
 
-        displayUser()
+        pictureDisplay?.setOnClickListener {
+            val intent = Intent(requireContext(), UploadPhotoProfileActivity::class.java)
+            startActivity(intent)
+        }
 
         logoutBtn?.setOnClickListener {
             logout()
         }
+
+        displayUser()
     }
 
     private fun displayUser() {
