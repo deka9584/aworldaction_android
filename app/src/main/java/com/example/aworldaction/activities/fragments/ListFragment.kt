@@ -31,10 +31,7 @@ class ListFragment : Fragment() {
         arguments?.let {
             toShow = it.getString(TO_SHOW)
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
         loadList()
     }
 

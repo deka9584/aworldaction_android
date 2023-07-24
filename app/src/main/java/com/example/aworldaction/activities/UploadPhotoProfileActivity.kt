@@ -9,6 +9,7 @@ import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
@@ -24,8 +25,6 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
-import java.io.FileInputStream
 
 
 class UploadPhotoProfileActivity : AppCompatActivity() {
@@ -54,6 +53,11 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
+        }
+
+        val backBtn = findViewById<ImageButton>(R.id.backBtn)
+        backBtn.setOnClickListener {
+            finish()
         }
 
         val pickerBtn = findViewById<Button>(R.id.pickerBtn)

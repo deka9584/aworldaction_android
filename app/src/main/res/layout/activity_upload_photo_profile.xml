@@ -22,7 +22,7 @@
 
         <TextView
             style="@style/view_title"
-            android:text="@string/register_btn"
+            android:text="@string/account"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
