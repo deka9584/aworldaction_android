@@ -1,7 +1,10 @@
 package com.example.aworldaction.activities
 
+import VolleyMultipartRequest
 import android.app.ProgressDialog
+import android.content.ContextParams
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,6 +18,10 @@ import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toFile
+import androidx.core.view.drawToBitmap
+import com.android.volley.NetworkResponse
+import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -25,12 +32,14 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 
 class UploadPhotoProfileActivity : AppCompatActivity() {
     private var pictureDisplay: ImageView? = null
     private var statusDisplay: TextView? = null
-    private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,12 +53,8 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
                 pictureDisplay?.let {
                     Glide.with(this)
                         .load(uri)
-                        .centerCrop()
-                        .transition(DrawableTransitionOptions.withCrossFade())
                         .into(it)
                 }
-
-                imageUri = uri
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -67,67 +72,49 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
 
         val uploadBtn = findViewById<Button>(R.id.uploadBtn)
         uploadBtn.setOnClickListener {
-            uploadImage()
+            pictureDisplay?.let {
+                uploadImage(it.drawable)
+            }
         }
     }
 
-    fun getStringImage(bmp: Bitmap): String? {
-        val baos = ByteArrayOutputStream()
-        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos)
-        val imageBytes: ByteArray = baos.toByteArray()
-        return Base64.encodeToString(imageBytes, Base64.DEFAULT)
-    }
-
-    private fun uploadImage() {
+    private fun uploadImage(image: Drawable) {
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri)
-        val image: String = getStringImage(bitmap)!!
+        val params = HashMap<String, VolleyMultipartRequest.DataPart>()
+        val imageData = AppSettings.getFileDataFromDrawable(baseContext, image)
 
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
+        val listener = Response.Listener<NetworkResponse> { response ->
+            val resultResponse = String(response.data)
 
-            if (responseJSON.has("user")) {
-                val user = responseJSON.getJSONObject("user")
-                AppSettings.setUser(user)
-            }
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-                statusDisplay?.text = message
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
+            try {
+                val result = JSONObject(resultResponse)
+                Log.d("serverApi", result.getString("message"))
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
         }
 
         val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
+            val networkResponse = error.networkResponse
 
-            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
+            networkResponse?.let {
+                val result = String(networkResponse.data)
 
-            try {
-                val jsonResponse = JSONObject(responseString)
-                val errorMessage = jsonResponse.getString("message")
-                statusDisplay?.text = errorMessage
-            } catch (e: JSONException) {
-                e.printStackTrace()
-                statusDisplay?.text = resources.getString(R.string.registration_failed)
+                try {
+                    val response = JSONObject(result)
+                    Log.e("serverApi", response.getString("message"))
+                } catch (e: JSONException) {
+                    e.printStackTrace()
+                }
             }
-
-            statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
         }
 
-        val request: StringRequest = object : StringRequest(
-            Method.POST,
+        val request = object : VolleyMultipartRequest(
             url,
             listener,
             errorListener
         ) {
-            override fun getParams(): Map<String, String>? {
-                val params: MutableMap<String, String> = HashMap()
-                params["image"] = image
-                return params
-            }
-
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
@@ -136,6 +123,12 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
             }
         }
 
+        imageData?.let {
+            params["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
+            request.setByteData(params)
+        }
+
         requestQueue.add(request)
     }
+
 }

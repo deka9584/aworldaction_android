@@ -1,14 +1,17 @@
 package com.example.aworldaction.settings
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import org.json.JSONObject
+import java.io.ByteArrayOutputStream
 import java.net.MalformedURLException
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
+
 
 object AppSettings {
     private val apiUrl = URL("https://aworldaction.zapto.org/api")
@@ -80,5 +83,12 @@ object AppSettings {
         }
 
         return ""
+    }
+
+    fun getFileDataFromDrawable(context: Context?, drawable: Drawable): ByteArray? {
+        val bitmap = (drawable as BitmapDrawable).bitmap
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
+        return byteArrayOutputStream.toByteArray()
     }
 }

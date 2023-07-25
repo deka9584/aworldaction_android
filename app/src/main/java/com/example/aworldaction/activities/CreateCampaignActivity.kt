@@ -16,6 +16,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.fragments.MapsFragment
+import com.example.aworldaction.managers.AppLocationManager
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,22 +25,31 @@ import java.util.*
 import kotlin.collections.HashMap
 
 class CreateCampaignActivity : AppCompatActivity() {
-    private var locationManager: LocationManager? = null
+    private var appLocationManager: AppLocationManager? = null
     private var locationListener: LocationListener? = null
+    private var userLocation: Location? = null
     private var progressBar: ProgressBar? = null
     private var titleField: EditText? = null
     private var captionField: EditText? = null
     private var localityDisplay: TextView? = null
     private var serverMessage: TextView? = null
-    private var userLocation: Location? = null
-    private var userLocality: String? = null
     private var mapsFragment: MapsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_campaign)
 
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        appLocationManager = AppLocationManager(this)
+
+        locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                showMap(location)
+                userLocation = location
+                localityDisplay?.text = appLocationManager?.getLocality(location)
+            }
+
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        }
 
         progressBar = findViewById(R.id.progressBar)
         titleField = findViewById(R.id.titleField)
@@ -64,7 +74,10 @@ class CreateCampaignActivity : AppCompatActivity() {
         }
 
         localityDisplay?.text = resources.getString(R.string.waiting_locatoin)
-        readUserLocation()
+
+        locationListener?.let {
+            appLocationManager?.startListener(it)
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -75,72 +88,29 @@ class CreateCampaignActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == 1 && grantResults.isNotEmpty()) {
-            readUserLocation()
+            locationListener?.let {
+                appLocationManager?.startListener(it)
+            }
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-
-        if (locationListener != null) {
-            locationManager?.removeUpdates(locationListener!!)
-        }
+        appLocationManager?.stopListener()
     }
 
-    private fun readUserLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        ) {
-            if (locationListener == null) {
-                locationListener = object : LocationListener {
-                    override fun onLocationChanged(location: Location) {
-                        userLocation = location
-                        showMap()
-                    }
+    private fun showMap(loc: Location) {
+        val frame = findViewById<FrameLayout>(R.id.mapsFragment)
 
-                    override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
-                }
+        if (mapsFragment == null) {
+            mapsFragment = MapsFragment.newInstance(loc.latitude, loc.longitude)
 
-                locationManager?.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener!!)
-            }
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                1
-            )
-        }
-    }
+            supportFragmentManager
+                .beginTransaction()
+                .replace(frame.id, mapsFragment!!)
+                .commit()
 
-    private fun showMap() {
-        if (userLocation != null) {
-            val frame = findViewById<FrameLayout>(R.id.mapsFragment)
-            val loc = userLocation!!
-
-            if (mapsFragment == null) {
-                mapsFragment = MapsFragment.newInstance(loc.latitude, loc.longitude)
-
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(frame.id, mapsFragment!!)
-                    .commit()
-
-                frame.visibility = View.VISIBLE
-            }
-
-            val geocoder = Geocoder(this, Locale.getDefault())
-
-            try {
-                val addresses: List<Address>? = geocoder.getFromLocation(loc.latitude, loc.longitude, 1)
-
-                if (addresses != null && addresses.isNotEmpty()) {
-                    val locality = addresses[0].locality ?: resources.getString(R.string.unknown_locality)
-                    localityDisplay?.text = locality
-                    userLocality = locality
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            frame.visibility = View.VISIBLE
         }
     }
 
@@ -196,7 +166,7 @@ class CreateCampaignActivity : AppCompatActivity() {
                 val params = HashMap<String, String>()
                 params["name"] = titleField?.text.toString()
                 params["description"] = captionField?.text.toString()
-                params["location_name"] = "$userLocality"
+                params["location_name"] = "${localityDisplay?.text}"
                 params["location_lat"] = "${userLocation?.latitude}"
                 params["location_lng"] = "${userLocation?.longitude}"
                 return params

@@ -75,7 +75,7 @@ class AccountFragment : Fragment() {
                 if (url != null) {
                     Glide.with(requireContext())
                         .load(url)
-                        .into(pictureDisplay!!)
+                        .into(it)
                 } else {
                     pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
                 }
