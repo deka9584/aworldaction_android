@@ -34,4 +34,5 @@
     <string name="upload">Carica</string>
     <string name="picker_gallery">Scegli foto</string>
     <string name="upload_failed">Upload fallito</string>
+    <string name="profile_pict">Foto profilo</string>
 </resources>

@@ -22,7 +22,7 @@
 
         <TextView
             style="@style/view_title"
-            android:text="@string/account"
+            android:text="@string/profile_pict"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

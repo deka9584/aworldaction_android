@@ -1,16 +1,9 @@
 package com.example.aworldaction.activities
 
 import VolleyMultipartRequest
-import android.app.ProgressDialog
-import android.content.ContextParams
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -18,28 +11,20 @@ import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.net.toFile
-import androidx.core.view.drawToBitmap
 import com.android.volley.NetworkResponse
-import com.android.volley.Request
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 
 class UploadPhotoProfileActivity : AppCompatActivity() {
     private var pictureDisplay: ImageView? = null
     private var statusDisplay: TextView? = null
+    private var pictureSelected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +33,21 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
         pictureDisplay = findViewById(R.id.pictureDisplay)
         statusDisplay = findViewById(R.id.statusDisplay)
 
+        val user = AppSettings.getUser()
+        if (user?.has("picture_path") == true) {
+            val url = AppSettings.getStorageUrl(user.getString("picture_path"))
+
+            pictureDisplay?.let {
+                if (url != null) {
+                    Glide.with(this)
+                        .load(url)
+                        .into(it)
+                } else {
+                    pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
+                }
+            }
+        }
+
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 pictureDisplay?.let {
@@ -55,6 +55,8 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
                         .load(uri)
                         .into(it)
                 }
+
+                pictureSelected = true
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -72,8 +74,10 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
 
         val uploadBtn = findViewById<Button>(R.id.uploadBtn)
         uploadBtn.setOnClickListener {
-            pictureDisplay?.let {
-                uploadImage(it.drawable)
+            if (pictureSelected) {
+                pictureDisplay?.let {
+                    uploadImage(it.drawable)
+                }
             }
         }
     }
@@ -89,7 +93,15 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
 
             try {
                 val result = JSONObject(resultResponse)
-                Log.d("serverApi", result.getString("message"))
+
+                if (result.has("message")) {
+                    statusDisplay?.text = result.getString("message")
+                    statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
+                }
+
+                if (result.has("user")) {
+                    AppSettings.setUser(result.getJSONObject("user"))
+                }
             } catch (e: JSONException) {
                 e.printStackTrace()
             }

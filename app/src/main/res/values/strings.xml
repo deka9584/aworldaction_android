@@ -41,4 +41,5 @@
     <string name="upload">Upload</string>
     <string name="picker_gallery">Select picture</string>
     <string name="upload_failed">Upload failed</string>
+    <string name="profile_pict">Profile picture</string>
 </resources>

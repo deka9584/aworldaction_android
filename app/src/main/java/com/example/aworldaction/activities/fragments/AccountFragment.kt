@@ -32,6 +32,11 @@ class AccountFragment : Fragment() {
         homeActivity = requireActivity() as? HomeActivity
     }
 
+    override fun onResume() {
+        super.onResume()
+        displayUser()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,8 +59,6 @@ class AccountFragment : Fragment() {
         logoutBtn?.setOnClickListener {
             logout()
         }
-
-        displayUser()
     }
 
     private fun displayUser() {
