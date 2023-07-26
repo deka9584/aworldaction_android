@@ -3,47 +3,53 @@ package com.example.aworldaction.activities
 import VolleyMultipartRequest
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import com.android.volley.NetworkResponse
 import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
+import java.net.URI
 
-
-class UploadPhotoProfileActivity : AppCompatActivity() {
+class UploadCampaignPictureActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
     private var pictureDisplay: ImageView? = null
+    private var pictureCaption: EditText? = null
+    private var picturePlaceholder: LinearLayout? = null
     private var statusDisplay: TextView? = null
-    private var pictureSelected = false
+    private var imageSelected = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_upload_photo_profile)
+        setContentView(R.layout.activity_upload_campaign_picture)
+
+        val campaignId = intent.getIntExtra("campaignId", 0)
 
         progressBar = findViewById(R.id.progressBar)
         pictureDisplay = findViewById(R.id.pictureDisplay)
+        pictureCaption = findViewById(R.id.pictureCaption)
+        picturePlaceholder = findViewById(R.id.imagePlaceholder)
         statusDisplay = findViewById(R.id.statusDisplay)
 
         val pickMedia = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
             if (uri != null) {
                 previewImage(uri)
-                pictureSelected = true
+                imageSelected = true
             } else {
                 Log.d("PhotoPicker", "No media selected")
             }
@@ -56,43 +62,14 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
 
         val pickerBtn = findViewById<Button>(R.id.pickerBtn)
         pickerBtn.setOnClickListener {
-            if (progressBar?.isVisible == false) {
-                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            }
+            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
 
-        val uploadBtn = findViewById<Button>(R.id.uploadBtn)
-        uploadBtn.setOnClickListener {
-            if (pictureSelected && progressBar?.isVisible == false) {
+        val submitBtn= findViewById<Button>(R.id.submitBtn)
+        submitBtn.setOnClickListener {
+            if (campaignId != 0 && pictureCaption?.text?.isBlank() == false && imageSelected) {
                 pictureDisplay?.let {
-                    uploadImage(it.drawable)
-                }
-            }
-        }
-
-        val deletePictureBtn = findViewById<Button>(R.id.deletePictureBtn)
-        deletePictureBtn.setOnClickListener {
-            if (progressBar?.isVisible == false) {
-                pictureSelected = false
-                deleteImage()
-            }
-        }
-
-        updatePicture()
-    }
-
-    private fun updatePicture() {
-        val user = AppSettings.getUser()
-        if (user?.has("picture_path") == true) {
-            val url = AppSettings.getStorageUrl(user.getString("picture_path"))
-
-            pictureDisplay?.let {
-                if (url != null) {
-                    Glide.with(this)
-                        .load(url)
-                        .into(it)
-                } else {
-                    pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
+                    uploadImage(it.drawable, campaignId)
                 }
             }
         }
@@ -103,13 +80,15 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
             Glide.with(this)
                 .load(uri)
                 .into(it)
+            it.visibility = View.VISIBLE
         }
+
+        picturePlaceholder?.visibility = View.GONE
     }
 
-    private fun uploadImage(image: Drawable) {
+    private fun uploadImage(image: Drawable, campaignId: Int) {
         val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-        val params = HashMap<String, VolleyMultipartRequest.DataPart>()
+        val url = AppSettings.getAPIUrl().toString() + "/campaign-pictures"
         val imageData = AppSettings.getFileDataFromDrawable(baseContext, image)
 
         val listener = Response.Listener<NetworkResponse> { response ->
@@ -121,9 +100,8 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
                 statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
             }
 
-            if (result.has("user")) {
-                AppSettings.setUser(result.getJSONObject("user"))
-                updatePicture()
+            if (result.has("campaignPicture")) {
+                finish()
             }
 
             progressBar?.visibility = View.INVISIBLE
@@ -166,63 +144,14 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
         }
 
         imageData?.let {
+            val params = HashMap<String, VolleyMultipartRequest.DataPart>()
             params["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
             request.setByteData(params)
-        }
 
-        requestQueue.add(request)
-        progressBar?.visibility = View.VISIBLE
-    }
-
-    private fun deleteImage() {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-                statusDisplay?.text = message
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            if (responseJSON.has("user")) {
-                AppSettings.setUser(responseJSON.getJSONObject("user"))
-                updatePicture()
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-
-            if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
-                val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-                try {
-                    val jsonResponse = JSONObject(responseString)
-                    val errorMessage = jsonResponse.getString("message")
-                    statusDisplay?.text = errorMessage
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    statusDisplay?.text = resources.getString(R.string.upload_failed)
-                }
-
-                statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-                progressBar?.visibility = View.INVISIBLE
-            }
-        }
-
-        val request = object : StringRequest(
-            Method.DELETE, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
+            val textParams = HashMap<String, String>()
+            textParams["campaign_id"] = "$campaignId"
+            textParams["caption"] = "${pictureCaption?.text}"
+            request.setTextParams(textParams)
         }
 
         requestQueue.add(request)

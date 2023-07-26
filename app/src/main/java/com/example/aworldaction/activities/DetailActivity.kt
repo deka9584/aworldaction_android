@@ -1,5 +1,6 @@
 package com.example.aworldaction.activities
 
+import android.content.Intent
 import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,9 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.net.toFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -15,6 +19,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
+import com.example.aworldaction.activities.auth.LoginActivity
 import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
@@ -55,9 +60,26 @@ class DetailActivity : AppCompatActivity() {
             loadCampaign(campaingId)
         }
 
-        val backBtn: ImageButton? = findViewById(R.id.backBtn)
-        backBtn?.setOnClickListener {
+        val backBtn = findViewById<ImageButton>(R.id.backBtn)
+        backBtn.setOnClickListener {
             finish()
+        }
+
+        val pictureBtn = findViewById<ImageButton>(R.id.pictureBtn)
+        pictureBtn.setOnClickListener {
+            val intent = Intent(this, UploadCampaignPictureActivity::class.java)
+            intent.putExtra("campaignId", campaingId)
+            startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        campaign?.let {
+            if (it.has("id")) {
+                loadCampaign(it.getInt("id"))
+            }
         }
     }
 
@@ -74,6 +96,7 @@ class DetailActivity : AppCompatActivity() {
                 if (campaign.has("pictures")) {
                     val pictures = campaign?.getJSONArray("pictures")
 
+                    this.pictures.clear()
                     for (i in 0 until pictures!!.length()) {
                         this.pictures.add(pictures.getJSONObject(i))
                     }
@@ -82,6 +105,7 @@ class DetailActivity : AppCompatActivity() {
                 if (campaign.has("contributors")) {
                     val contributors = campaign?.getJSONArray("contributors")
 
+                    this.contributors.clear()
                     for (i in 0 until contributors!!.length()) {
                         this.contributors.add(contributors.getJSONObject(i))
                     }

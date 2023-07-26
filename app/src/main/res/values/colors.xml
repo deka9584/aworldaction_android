@@ -10,9 +10,11 @@
     <color name="green">#39B54A</color>
     <color name="light_green">#8CC63F</color>
     <color name="transparent">#00000000</color>
+    <color name="gray_600">#4b5563</color>
     <color name="light_gray">#E9E9E9</color>
     <color name="blue">#2564eb</color>
     <color name="red">#ff0000</color>
+    <color name="danger">#B50202</color>
     <color name="orange">#ffa500</color>
 
 </resources>

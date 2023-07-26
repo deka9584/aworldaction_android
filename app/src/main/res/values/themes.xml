@@ -58,6 +58,17 @@
         <item name="android:src">@drawable/ic_baseline_arrow_left_24</item>
     </style>
 
+    <style name="picture_icon_btn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:adjustViewBounds">true</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="tint">@color/white</item>
+        <item name="contentDescription">Add photo</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:src">@drawable/ic_baseline_add_photo_alternate_24</item>
+    </style>
+
     <style name="view_title">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -131,6 +142,20 @@
         <item name="android:layout_margin">8dp</item>
         <item name="android:background">@drawable/text_field_bg</item>
         <item name="android:hint">@string/campaign_caption</item>
+        <item name="android:inputType">textMultiLine</item>
+        <item name="android:lines">4</item>
+        <item name="android:gravity">top|start</item>
+        <item name="android:scrollbars">vertical</item>
+    </style>
+
+    <style name="picture_caption_edittext">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:layout_marginHorizontal">20dp</item>
+        <item name="android:background">@drawable/text_field_bg</item>
+        <item name="android:hint">@string/picture_caption</item>
         <item name="android:inputType">textMultiLine</item>
         <item name="android:lines">4</item>
         <item name="android:gravity">top|start</item>

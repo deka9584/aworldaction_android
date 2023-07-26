@@ -42,6 +42,7 @@
 
         <TextView
             style="@style/sub_head"
+            android:layout_marginBottom="24dp"
             android:text="@string/upload_profile_photo"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -80,12 +81,30 @@
             android:layout_height="wrap_content"
             android:layout_margin="12dp" />
 
-        <Button
-            android:id="@+id/pickerBtn"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/picker_gallery"
-            android:layout_marginHorizontal="8dp" />
+            android:gravity="center"
+            android:orientation="horizontal"
+            >
+
+            <Button
+                android:id="@+id/pickerBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/picker_gallery"
+                android:layout_marginHorizontal="8dp" />
+
+            <Button
+                android:id="@+id/deletePictureBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/remove_picture"
+                android:backgroundTint="@color/danger"
+                android:layout_marginHorizontal="8dp" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/uploadBtn"
@@ -94,6 +113,16 @@
 
     </LinearLayout>
 
-
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        style="@android:style/Widget.Material.Light.ProgressBar"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

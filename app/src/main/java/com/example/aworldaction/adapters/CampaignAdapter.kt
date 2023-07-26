@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
@@ -23,6 +24,7 @@ import org.json.JSONObject
 
 class CampaignAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CampaignAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val placeHolder: LinearLayout
         val image: ImageView
         val title: TextView
         val locality: TextView
@@ -32,10 +34,11 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
         val mapsBtn: ImageButton
 
         init {
+            placeHolder = view.findViewById(R.id.picturePlaceholder)
+            image = view.findViewById(R.id.campaignPicture)
             title = view.findViewById(R.id.campaignTitle)
             locality = view.findViewById(R.id.localityDisplay)
             description = view.findViewById(R.id.description)
-            image = view.findViewById(R.id.campaignPicture)
             detailBtn = view.findViewById(R.id.detailBtn)
             favouritesBtn = view.findViewById(R.id.favouritesBtn)
             mapsBtn = view.findViewById(R.id.mapsBtn)
@@ -74,6 +77,9 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
                     Glide.with(context)
                         .load(url)
                         .into(viewHolder.image)
+
+                    viewHolder.placeHolder.visibility = View.GONE
+                    viewHolder.image.visibility = View.VISIBLE
                 }
             }
         }

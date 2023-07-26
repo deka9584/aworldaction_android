@@ -5,10 +5,7 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.HttpHeaderParser
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.DataOutputStream
-import java.io.IOException
+import java.io.*
 
 open class VolleyMultipartRequest(
     url: String,
@@ -24,6 +21,7 @@ open class VolleyMultipartRequest(
     private val dos = DataOutputStream(bos)
 
     private var dataPartMap: MutableMap<String, DataPart>? = null
+    private var textParams: MutableMap<String, String>? = null
 
     override fun getHeaders(): MutableMap<String, String> {
         return headers ?: super.getHeaders()
@@ -37,12 +35,22 @@ open class VolleyMultipartRequest(
         dataPartMap = data
     }
 
+    fun setTextParams(data: MutableMap<String, String>) {
+        textParams = data
+    }
+
     @Throws(AuthFailureError::class)
     override fun getBody(): ByteArray {
         try {
             dataPartMap?.let { dataPartMap ->
                 for ((key, value) in dataPartMap) {
                     buildDataPart(dos, value, key)
+                }
+            }
+
+            textParams?.let { textParams ->
+                for ((key, value) in textParams) {
+                    buildTextPart(dos, key, value)
                 }
             }
 
@@ -90,6 +98,19 @@ open class VolleyMultipartRequest(
         }
 
         dataOutputStream.writeBytes(lineEnd)
+    }
+
+    private fun buildTextPart(dataOutputStream: DataOutputStream, parameterName: String, parameterValue: String) {
+        try {
+            dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd)
+            dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"$parameterName\"\r\n")
+            dataOutputStream.writeBytes("\r\n")
+            dataOutputStream.writeBytes(parameterValue + "\r\n")
+        } catch (uee: UnsupportedEncodingException) {
+            throw RuntimeException("Encoding not supported: ", uee)
+        } catch (ioe: IOException) {
+            throw RuntimeException("IOException encountered: ", ioe)
+        }
     }
 
     companion object {

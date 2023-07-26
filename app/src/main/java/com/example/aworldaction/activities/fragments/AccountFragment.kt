@@ -19,6 +19,7 @@ import com.example.aworldaction.activities.DetailActivity
 import com.example.aworldaction.activities.HomeActivity
 import com.example.aworldaction.activities.UploadPhotoProfileActivity
 import com.example.aworldaction.settings.AppSettings
+import org.json.JSONException
 import org.json.JSONObject
 
 class AccountFragment : Fragment() {
@@ -69,7 +70,9 @@ class AccountFragment : Fragment() {
             return
         }
 
-        nameDisplay?.text = user?.getString("name")
+        if (user.has("name")) {
+            nameDisplay?.text = user?.getString("name")
+        }
 
         if (user.has("picture_path")) {
             val url = AppSettings.getStorageUrl(user.getString("picture_path"))
@@ -97,10 +100,14 @@ class AccountFragment : Fragment() {
         val url = AppSettings.getAPIUrl().toString() + "/logout"
 
         val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
+            try {
+                val responseJSON = JSONObject(response)
 
-            if (responseJSON.has("message")) {
-                Log.d("serverApi", responseJSON.getString("message"))
+                if (responseJSON.has("message")) {
+                    Log.d("serverApi", responseJSON.getString("message"))
+                }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
 
             AppSettings.removeToken()

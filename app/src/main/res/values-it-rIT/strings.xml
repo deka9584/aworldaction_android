@@ -35,4 +35,10 @@
     <string name="picker_gallery">Scegli foto</string>
     <string name="upload_failed">Upload fallito</string>
     <string name="profile_pict">Foto profilo</string>
+    <string name="picker_camera">Scatta una foto</string>
+    <string name="remove_picture">Rimuovi foto</string>
+    <string name="new_campaign_picture">Nuova foto campagna</string>
+    <string name="picture_caption">Descrizione immagine</string>
+    <string name="picture_submit">Posta immagine</string>
+    <string name="no_pictures">Ancora nessuna immagine</string>
 </resources>
