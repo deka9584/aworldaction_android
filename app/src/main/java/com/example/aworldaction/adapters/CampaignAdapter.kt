@@ -24,7 +24,6 @@ import org.json.JSONObject
 
 class CampaignAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CampaignAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val placeHolder: LinearLayout
         val image: ImageView
         val title: TextView
         val locality: TextView
@@ -34,7 +33,6 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
         val mapsBtn: ImageButton
 
         init {
-            placeHolder = view.findViewById(R.id.picturePlaceholder)
             image = view.findViewById(R.id.campaignPicture)
             title = view.findViewById(R.id.campaignTitle)
             locality = view.findViewById(R.id.localityDisplay)
@@ -78,9 +76,11 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
                         .load(url)
                         .into(viewHolder.image)
 
-                    viewHolder.placeHolder.visibility = View.GONE
-                    viewHolder.image.visibility = View.VISIBLE
                 }
+            } else {
+                Glide.with(context)
+                    .load(context.resources.getDrawable(R.mipmap.picture_placeholder_foreground, context.theme))
+                    .into(viewHolder.image)
             }
         }
 

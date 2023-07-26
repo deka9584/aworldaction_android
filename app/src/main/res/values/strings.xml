@@ -48,4 +48,6 @@
     <string name="picture_caption">Picture caption</string>
     <string name="picture_submit">Post picture</string>
     <string name="no_pictures">No pictures yet</string>
+    <string name="change_password">Change password</string>
+    <string name="current_password">Current password</string>
 </resources>

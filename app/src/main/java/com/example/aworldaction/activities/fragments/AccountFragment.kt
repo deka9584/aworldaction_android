@@ -14,8 +14,8 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
+import com.example.aworldaction.activities.ChangePasswordActivity
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.DetailActivity
 import com.example.aworldaction.activities.HomeActivity
 import com.example.aworldaction.activities.UploadPhotoProfileActivity
 import com.example.aworldaction.settings.AppSettings
@@ -26,7 +26,6 @@ class AccountFragment : Fragment() {
     private var homeActivity: HomeActivity? = null
     private var nameDisplay: TextView? = null
     private var pictureDisplay: ImageView? = null
-    private var logoutBtn: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +41,6 @@ class AccountFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_account, container, false)
     }
 
@@ -50,14 +48,20 @@ class AccountFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         nameDisplay = view.findViewById(R.id.userName)
         pictureDisplay = view.findViewById(R.id.userPicture)
-        logoutBtn = view.findViewById(R.id.logoutBtn)
 
         pictureDisplay?.setOnClickListener {
             val intent = Intent(requireContext(), UploadPhotoProfileActivity::class.java)
             startActivity(intent)
         }
 
-        logoutBtn?.setOnClickListener {
+        val changePasswordBtn = view.findViewById<Button>(R.id.changePasswordBtn)
+        changePasswordBtn.setOnClickListener {
+            val intent = Intent(requireContext(), ChangePasswordActivity::class.java)
+            startActivity(intent)
+        }
+
+        val logoutBtn = view.findViewById<Button>(R.id.logoutBtn)
+        logoutBtn.setOnClickListener {
             logout()
         }
     }

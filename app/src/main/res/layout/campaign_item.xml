@@ -7,33 +7,6 @@
     android:layout_margin="24dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <LinearLayout
-        android:id="@+id/picturePlaceholder"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:background="@color/gray_600">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:scaleType="fitXY"
-            android:adjustViewBounds="true"
-            android:src="@drawable/ic_baseline_image_not_supported_24"
-            android:layout_marginBottom="12dp"
-            app:tint="@color/white"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_pictures"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textAllCaps="true"
-            android:textColor="@color/white"/>
-    </LinearLayout>
-
     <ImageView
         android:id="@+id/campaignPicture"
         android:layout_width="match_parent"
@@ -41,7 +14,6 @@
         android:adjustViewBounds="true"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_launcher_background"
-        android:visibility="gone"
         />
 
     <TextView

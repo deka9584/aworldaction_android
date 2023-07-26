@@ -49,7 +49,7 @@ class RegisterActivity : AppCompatActivity() {
                 val password = passwordField?.text.toString()
                 val passwordConfirm = passwordConfirmField?.text.toString()
 
-                if (username != "" && email != "" && password != "" && passwordConfirm != "") {
+                if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                     sendRegisterRequest(username, email, password, passwordConfirm)
                     resetFields()
                 }

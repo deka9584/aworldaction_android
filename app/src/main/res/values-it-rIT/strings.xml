@@ -41,4 +41,6 @@
     <string name="picture_caption">Descrizione immagine</string>
     <string name="picture_submit">Posta immagine</string>
     <string name="no_pictures">Ancora nessuna immagine</string>
+    <string name="change_password">Cambia password</string>
+    <string name="current_password">Password corrente</string>
 </resources>

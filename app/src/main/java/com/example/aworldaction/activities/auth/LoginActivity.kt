@@ -46,7 +46,7 @@ class LoginActivity : AppCompatActivity() {
                 val email = emailField?.text.toString()
                 val password = passwordField?.text.toString()
 
-                if (email != "" && password != "") {
+                if (email.isNotBlank() && password.isNotBlank()) {
                     sendLoginRequest(email, password)
                     resetFields()
                 }
