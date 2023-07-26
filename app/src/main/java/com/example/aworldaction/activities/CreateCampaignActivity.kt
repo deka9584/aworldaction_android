@@ -1,16 +1,12 @@
 package com.example.aworldaction.activities
 
-import android.Manifest
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.location.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.core.app.ActivityCompat
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -20,8 +16,6 @@ import com.example.aworldaction.managers.AppLocationManager
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
-import java.io.IOException
-import java.util.*
 import kotlin.collections.HashMap
 
 class CreateCampaignActivity : AppCompatActivity() {
@@ -32,7 +26,7 @@ class CreateCampaignActivity : AppCompatActivity() {
     private var titleField: EditText? = null
     private var captionField: EditText? = null
     private var localityDisplay: TextView? = null
-    private var serverMessage: TextView? = null
+    private var statusDisplay: TextView? = null
     private var mapsFragment: MapsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,7 +49,7 @@ class CreateCampaignActivity : AppCompatActivity() {
         titleField = findViewById(R.id.titleField)
         captionField = findViewById(R.id.captionField)
         localityDisplay = findViewById(R.id.localityDisplay)
-        serverMessage = findViewById(R.id.authStatus)
+        statusDisplay = findViewById(R.id.authStatus)
 
         val backBtn = findViewById<ImageButton>(R.id.backBtn)
         backBtn.setOnClickListener {
@@ -135,8 +129,8 @@ class CreateCampaignActivity : AppCompatActivity() {
 
             if (responseJSON.has("message")) {
                 val message = responseJSON.getString("message")
-                serverMessage?.text = message
-                serverMessage?.setTextColor(resources.getColor(R.color.green, theme))
+                statusDisplay?.text = message
+                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
             }
 
             progressBar?.visibility = View.INVISIBLE
@@ -144,18 +138,20 @@ class CreateCampaignActivity : AppCompatActivity() {
 
         val errorListener = Response.ErrorListener { error ->
             val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-            Log.e("serverAPI", error.toString())
 
             try {
                 val jsonResponse = JSONObject(responseString)
-                val errorMessage = jsonResponse.getString("message")
-                serverMessage?.text = errorMessage
+                statusDisplay?.text = "${error.networkResponse?.statusCode}"
+
+                if (jsonResponse.has("message")) {
+                    statusDisplay?.text = jsonResponse.getString("message")
+                }
             } catch (e: JSONException) {
                 e.printStackTrace()
-                serverMessage?.text = "${error.networkResponse.statusCode}"
             }
 
-            serverMessage?.setTextColor(resources.getColor(R.color.red, theme))
+            Log.e("serverAPI", error.toString())
+            statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
             progressBar?.visibility = View.INVISIBLE
         }
 
@@ -164,8 +160,8 @@ class CreateCampaignActivity : AppCompatActivity() {
 
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                params["name"] = titleField?.text.toString()
-                params["description"] = captionField?.text.toString()
+                params["name"] = "${titleField?.text}"
+                params["description"] = "${captionField?.text}"
                 params["location_name"] = "${localityDisplay?.text}"
                 params["location_lat"] = "${userLocation?.latitude}"
                 params["location_lng"] = "${userLocation?.longitude}"

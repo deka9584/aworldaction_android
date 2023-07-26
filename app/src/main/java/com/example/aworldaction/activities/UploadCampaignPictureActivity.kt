@@ -1,6 +1,6 @@
 package com.example.aworldaction.activities
 
-import VolleyMultipartRequest
+import com.example.aworldaction.requests.VolleyMultipartRequest
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -24,7 +24,6 @@ import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
-import java.net.URI
 
 class UploadCampaignPictureActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
@@ -108,25 +107,22 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
         }
 
         val errorListener = Response.ErrorListener { error ->
-            val networkResponse = error.networkResponse
+            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
 
-            networkResponse?.let {
-                val result = String(networkResponse.data)
+            try {
+                val jsonResponse = JSONObject(responseString)
+                statusDisplay?.text = "${error.networkResponse?.statusCode}"
 
-                try {
-                    val response = JSONObject(result)
-
-                    if (response.has("message")) {
-                        val message = response.getString("message")
-                        Log.e("serverApi", message)
-                        statusDisplay?.text = message
-                        statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+                if (jsonResponse.has("message")) {
+                    val message = jsonResponse.getString("message")
+                    statusDisplay?.text = message
                 }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
 
+            Log.e("serverApi", error.toString())
+            statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
             progressBar?.visibility = View.INVISIBLE
         }
 
@@ -144,9 +140,9 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
         }
 
         imageData?.let {
-            val params = HashMap<String, VolleyMultipartRequest.DataPart>()
-            params["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
-            request.setByteData(params)
+            val dataParams = HashMap<String, VolleyMultipartRequest.DataPart>()
+            dataParams["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
+            request.setByteData(dataParams)
 
             val textParams = HashMap<String, String>()
             textParams["campaign_id"] = "$campaignId"

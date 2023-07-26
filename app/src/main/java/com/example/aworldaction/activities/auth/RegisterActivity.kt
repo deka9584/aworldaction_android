@@ -98,6 +98,7 @@ class RegisterActivity : AppCompatActivity() {
 
             if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
                 val responseString = String(error.networkResponse?.data ?: byteArrayOf())
+
                 try {
                     val jsonResponse = JSONObject(responseString)
                     val errorMessage = jsonResponse.getString("message")

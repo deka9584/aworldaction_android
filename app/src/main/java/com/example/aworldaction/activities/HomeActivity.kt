@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.auth.RegisterActivity
 import com.example.aworldaction.activities.fragments.AccountFragment
 import com.example.aworldaction.activities.fragments.ListFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -32,7 +31,7 @@ class HomeActivity : AppCompatActivity() {
                     return@setOnItemSelectedListener true
                 }
                 R.id.menu_new_campaign -> {
-                    openCampaignForm()
+                    showCreateCampaign()
                     return@setOnItemSelectedListener false
                 }
                 R.id.menu_completed -> {
@@ -61,7 +60,7 @@ class HomeActivity : AppCompatActivity() {
             .commit()
     }
 
-    private fun openCampaignForm() {
+    private fun showCreateCampaign() {
         val intent = Intent(this, CreateCampaignActivity::class.java)
         startActivity(intent)
     }

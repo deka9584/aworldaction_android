@@ -1,6 +1,6 @@
 package com.example.aworldaction.activities
 
-import VolleyMultipartRequest
+import com.example.aworldaction.requests.VolleyMultipartRequest
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -109,7 +109,6 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
     private fun uploadImage(image: Drawable) {
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-        val params = HashMap<String, VolleyMultipartRequest.DataPart>()
         val imageData = AppSettings.getFileDataFromDrawable(baseContext, image)
 
         val listener = Response.Listener<NetworkResponse> { response ->
@@ -130,23 +129,19 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
         }
 
         val errorListener = Response.ErrorListener { error ->
-            val networkResponse = error.networkResponse
+            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
 
-            networkResponse?.let {
-                val result = String(networkResponse.data)
+            try {
+                val response = JSONObject(responseString)
 
-                try {
-                    val response = JSONObject(result)
-
-                    if (response.has("message")) {
-                        val message = response.getString("message")
-                        Log.e("serverApi", message)
-                        statusDisplay?.text = message
-                        statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-                    }
-                } catch (e: JSONException) {
-                    e.printStackTrace()
+                if (response.has("message")) {
+                    val message = response.getString("message")
+                    Log.e("serverApi", message)
+                    statusDisplay?.text = message
+                    statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
                 }
+            } catch (e: JSONException) {
+                e.printStackTrace()
             }
 
             progressBar?.visibility = View.INVISIBLE
@@ -166,6 +161,7 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
         }
 
         imageData?.let {
+            val params = HashMap<String, VolleyMultipartRequest.DataPart>()
             params["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
             request.setByteData(params)
         }
