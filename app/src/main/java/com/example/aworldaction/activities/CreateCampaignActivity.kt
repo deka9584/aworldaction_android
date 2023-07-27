@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.managers.AppLocationManager
+import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -136,24 +137,7 @@ class CreateCampaignActivity : AppCompatActivity() {
             progressBar?.visibility = View.INVISIBLE
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-
-            try {
-                val jsonResponse = JSONObject(responseString)
-                statusDisplay?.text = "${error.networkResponse?.statusCode}"
-
-                if (jsonResponse.has("message")) {
-                    statusDisplay?.text = jsonResponse.getString("message")
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-
-            Log.e("serverAPI", error.toString())
-            statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-            progressBar?.visibility = View.INVISIBLE
-        }
+        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
 
         val request = object : StringRequest(
             Method.POST, url, listener, errorListener) {

@@ -21,6 +21,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -109,7 +110,7 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
     private fun uploadImage(image: Drawable) {
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-        val imageData = AppSettings.getFileDataFromDrawable(baseContext, image)
+        val imageData = AppSettings.getFileDataFromDrawable(image)
 
         val listener = Response.Listener<NetworkResponse> { response ->
             val resultResponse = String(response.data)
@@ -128,24 +129,7 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
             progressBar?.visibility = View.INVISIBLE
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-
-            try {
-                val response = JSONObject(responseString)
-
-                if (response.has("message")) {
-                    val message = response.getString("message")
-                    Log.e("serverApi", message)
-                    statusDisplay?.text = message
-                    statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
+        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
 
         val request = object : VolleyMultipartRequest(
             url,

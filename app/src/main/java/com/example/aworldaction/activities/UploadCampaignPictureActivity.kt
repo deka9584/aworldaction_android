@@ -16,11 +16,13 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.android.volley.NetworkResponse
 import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -88,7 +90,7 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
     private fun uploadImage(image: Drawable, campaignId: Int) {
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/campaign-pictures"
-        val imageData = AppSettings.getFileDataFromDrawable(baseContext, image)
+        val imageData = AppSettings.getFileDataFromDrawable(image)
 
         val listener = Response.Listener<NetworkResponse> { response ->
             val resultResponse = String(response.data)
@@ -106,25 +108,7 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
             progressBar?.visibility = View.INVISIBLE
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-
-            try {
-                val jsonResponse = JSONObject(responseString)
-                statusDisplay?.text = "${error.networkResponse?.statusCode}"
-
-                if (jsonResponse.has("message")) {
-                    val message = jsonResponse.getString("message")
-                    statusDisplay?.text = message
-                }
-            } catch (e: JSONException) {
-                e.printStackTrace()
-            }
-
-            Log.e("serverApi", error.toString())
-            statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-            progressBar?.visibility = View.INVISIBLE
-        }
+        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
 
         val request = object : VolleyMultipartRequest(
             url,

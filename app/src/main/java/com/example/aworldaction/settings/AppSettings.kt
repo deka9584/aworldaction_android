@@ -5,6 +5,14 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import android.util.Log
+import android.view.View
+import android.widget.ProgressBar
+import android.widget.TextView
+import com.android.volley.Response
+import com.android.volley.Response.ErrorListener
+import com.example.aworldaction.R
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.net.MalformedURLException
@@ -62,8 +70,8 @@ object AppSettings {
 
         try {
             return URL(newUrl)
-        } catch (error: MalformedURLException) {
-            error.printStackTrace()
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
         }
 
         return null
@@ -85,10 +93,16 @@ object AppSettings {
         return ""
     }
 
-    fun getFileDataFromDrawable(context: Context?, drawable: Drawable): ByteArray? {
-        val bitmap = (drawable as BitmapDrawable).bitmap
-        val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
-        return byteArrayOutputStream.toByteArray()
+    fun getFileDataFromDrawable(drawable: Drawable): ByteArray? {
+        try {
+            val bitmap = (drawable as BitmapDrawable).bitmap
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, byteArrayOutputStream)
+            return byteArrayOutputStream.toByteArray()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return null
     }
 }

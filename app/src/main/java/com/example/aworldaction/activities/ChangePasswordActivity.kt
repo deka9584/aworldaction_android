@@ -13,6 +13,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
+import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,8 +37,12 @@ class ChangePasswordActivity : AppCompatActivity() {
 
         val submitBtn = findViewById<Button>(R.id.submitBtn)
         submitBtn.setOnClickListener {
-            if (currentPassField?.text?.isBlank() == false && passField?.text?.isBlank() == false) {
-                sendChangePassRequest()
+            val currentPass = currentPassField?.text.toString()
+            val pass = passField?.text.toString()
+            val passConfirm = passConfirmField?.text.toString()
+
+            if (currentPass.isNotBlank() && pass.isNotBlank() && passConfirm.isNotBlank()) {
+                sendChangePassRequest(currentPass, pass, passConfirm)
                 resetFields()
             }
         }
@@ -48,7 +53,7 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendChangePassRequest() {
+    private fun sendChangePassRequest(currPass: String, pass: String, passConfirm: String) {
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser/changepassword"
 
@@ -71,35 +76,16 @@ class ChangePasswordActivity : AppCompatActivity() {
             progressBar?.visibility = View.INVISIBLE
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-
-            if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
-                val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-
-                try {
-                    val jsonResponse = JSONObject(responseString)
-                    val errorMessage = jsonResponse.getString("message")
-                    statusDisplay?.text = errorMessage
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    statusDisplay?.text = "${error.networkResponse?.statusCode}"
-                }
-
-                statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
+        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
 
         val request = object : StringRequest(
             Method.POST, url, listener, errorListener) {
 
             override fun getParams(): MutableMap<String, String> {
                 val params = HashMap<String, String>()
-                params["current_password"] = "${currentPassField?.text}"
-                params["password"] = "${passField?.text}"
-                params["password_confirmation"] = "${passConfirmField?.text}"
+                params["current_password"] = currPass
+                params["password"] = pass
+                params["password_confirmation"] = passConfirm
                 return params
             }
 

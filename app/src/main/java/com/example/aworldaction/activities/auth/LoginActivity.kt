@@ -17,6 +17,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.MainActivity
+import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
@@ -35,13 +36,13 @@ class LoginActivity : AppCompatActivity() {
         emailField = findViewById(R.id.userField)
         passwordField = findViewById(R.id.passwordField)
 
-        val backBtn: ImageButton? = findViewById(R.id.backBtn)
-        backBtn?.setOnClickListener {
+        val backBtn = findViewById<ImageButton>(R.id.backBtn)
+        backBtn.setOnClickListener {
             finish()
         }
 
-        val loginBtn: Button? = findViewById(R.id.loginBtn)
-        loginBtn?.setOnClickListener {
+        val loginBtn = findViewById<Button>(R.id.loginBtn)
+        loginBtn.setOnClickListener {
             if (progressBar?.visibility == View.INVISIBLE) {
                 val email = emailField?.text.toString()
                 val password = passwordField?.text.toString()
@@ -53,8 +54,8 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        val newAccountLink: TextView? = findViewById(R.id.newAccountLink)
-        newAccountLink?.setOnClickListener {
+        val newAccountLink = findViewById<TextView>(R.id.newAccountLink)
+        newAccountLink.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
             finish()
@@ -70,14 +71,13 @@ class LoginActivity : AppCompatActivity() {
 
             if (responseJSON.has("token")) {
                 val token = responseJSON.getString("token")
-                val user = responseJSON.getJSONObject("user")
-
                 AppSettings.setToken(token)
-                AppSettings.setUser(user)
-
                 Log.d("token", token)
-                Log.d("user", user.toString())
+            }
 
+            if (responseJSON.has("user")) {
+                val user = responseJSON.getJSONObject("user")
+                AppSettings.setUser(user)
                 finish()
             }
 
@@ -90,16 +90,7 @@ class LoginActivity : AppCompatActivity() {
             progressBar?.visibility = View.INVISIBLE
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-
-            if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
-                authStatus?.text = resources.getString(R.string.login_failed)
-                authStatus?.setTextColor(resources.getColor(R.color.red, theme))
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
+        val errorListener = RequestsHelper.getErrorListener(this, authStatus, progressBar)
 
         val request = object : StringRequest(
             Method.POST, url, listener, errorListener) {
