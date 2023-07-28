@@ -123,6 +123,7 @@ class ListFragment : Fragment() {
     companion object {
         private const val TO_SHOW = "param1"
 
+        @JvmStatic
         fun newInstance(param1: String): ListFragment {
             val fragment = ListFragment()
             val args = Bundle()

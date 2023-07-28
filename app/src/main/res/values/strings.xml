@@ -52,4 +52,5 @@
     <string name="current_password">Current password</string>
     <string name="role_admin">Admin</string>
     <string name="role_user">User</string>
+    <string name="insert_comment">Insert comment</string>
 </resources>

@@ -87,6 +87,7 @@ class MapsFragment : Fragment() {
         private const val LAT = "param1"
         private const val LNG = "param2"
 
+        @JvmStatic
         fun newInstance(param1: Double, param2: Double): MapsFragment {
             val fragment = MapsFragment()
             val args = Bundle()

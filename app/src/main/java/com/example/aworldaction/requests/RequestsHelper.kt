@@ -12,7 +12,7 @@ import org.json.JSONObject
 
 object RequestsHelper {
     fun getErrorListener(context: Context, statusDisplay: TextView?, progressBar: ProgressBar?) : Response.ErrorListener {
-        val errorListener = Response.ErrorListener { error ->
+        return Response.ErrorListener { error ->
             val responseString = String(error.networkResponse?.data ?: byteArrayOf())
 
             try {
@@ -34,7 +34,5 @@ object RequestsHelper {
             statusDisplay?.setTextColor(context.resources.getColor(R.color.red, context.theme))
             progressBar?.visibility = View.INVISIBLE
         }
-
-        return errorListener
     }
 }
