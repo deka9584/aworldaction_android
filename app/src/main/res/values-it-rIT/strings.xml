@@ -43,4 +43,6 @@
     <string name="no_pictures">Ancora nessuna immagine</string>
     <string name="change_password">Cambia password</string>
     <string name="current_password">Password corrente</string>
+    <string name="role_admin">Amministratore</string>
+    <string name="role_user">Utente</string>
 </resources>

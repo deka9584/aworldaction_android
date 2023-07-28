@@ -50,4 +50,6 @@
     <string name="no_pictures">No pictures yet</string>
     <string name="change_password">Change password</string>
     <string name="current_password">Current password</string>
+    <string name="role_admin">Admin</string>
+    <string name="role_user">User</string>
 </resources>

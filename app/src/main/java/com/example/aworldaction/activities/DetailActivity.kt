@@ -94,19 +94,19 @@ class DetailActivity : AppCompatActivity() {
                 val campaign = responseJSON.getJSONObject("data")
 
                 if (campaign.has("pictures")) {
-                    val pictures = campaign?.getJSONArray("pictures")
+                    val pictures = campaign.getJSONArray("pictures")
 
                     this.pictures.clear()
-                    for (i in 0 until pictures!!.length()) {
+                    for (i in 0 until pictures.length()) {
                         this.pictures.add(pictures.getJSONObject(i))
                     }
                 }
 
                 if (campaign.has("contributors")) {
-                    val contributors = campaign?.getJSONArray("contributors")
+                    val contributors = campaign.getJSONArray("contributors")
 
                     this.contributors.clear()
-                    for (i in 0 until contributors!!.length()) {
+                    for (i in 0 until contributors.length()) {
                         this.contributors.add(contributors.getJSONObject(i))
                     }
                 }
@@ -147,22 +147,22 @@ class DetailActivity : AppCompatActivity() {
         val contributorAdapter = ContributorAdapter(contributors, this)
         contributorsDisplay?.adapter = contributorAdapter
 
-        campaign?.let { campaign ->
-            if (campaign.has("name")) {
-                titleDisplay?.text = campaign.getString("name")
+        campaign?.let {
+            if (it.has("name")) {
+                titleDisplay?.text = it.getString("name")
             }
 
-            if (campaign.has("location_name")) {
-                localityDisplay?.text = campaign.getString("location_name")
+            if (it.has("location_name")) {
+                localityDisplay?.text = it.getString("location_name")
             }
 
-            if (campaign.has("description")) {
-                descriptionDisplay?.text = campaign.getString("description")
+            if (it.has("description")) {
+                descriptionDisplay?.text = it.getString("description")
             }
 
-            if (campaign.has("location_lat") || campaign.has("location_lng")) {
-                val lat = campaign.getDouble("location_lat")
-                val lng = campaign.getDouble("location_lng")
+            if (it.has("location_lat") || it.has("location_lng")) {
+                val lat = it.getDouble("location_lat")
+                val lng = it.getDouble("location_lng")
 
                 supportFragmentManager
                     .beginTransaction()
@@ -170,8 +170,8 @@ class DetailActivity : AppCompatActivity() {
                     .commit()
             }
 
-            if (campaign.has("completed")) {
-                if (campaign.getInt("completed") == 1) {
+            if (it.has("completed")) {
+                if (it.getInt("completed") == 1) {
                     statusImgDisplay?.setImageResource(R.drawable.ic_baseline_done_all_24)
                     statusImgDisplay?.setColorFilter(resources.getColor(R.color.green, theme))
                     statusTxtDisplay?.text = resources.getString(R.string.campaign_completed)

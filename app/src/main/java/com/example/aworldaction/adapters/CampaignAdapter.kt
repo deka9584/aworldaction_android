@@ -25,6 +25,7 @@ import org.json.JSONObject
 class CampaignAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CampaignAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView
+        val progress: TextView
         val title: TextView
         val locality: TextView
         val description: TextView
@@ -34,6 +35,7 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         init {
             image = view.findViewById(R.id.campaignPicture)
+            progress = view.findViewById(R.id.progressDisplay)
             title = view.findViewById(R.id.campaignTitle)
             locality = view.findViewById(R.id.localityDisplay)
             description = view.findViewById(R.id.description)
@@ -84,12 +86,29 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
             }
         }
 
+        if (campaign.has("completed")) {
+            viewHolder.progress.visibility =
+                if (campaign.getInt("completed") == 1) View.VISIBLE
+                else View.GONE
+        }
+
         if (campaign.has("contributors")) {
             val contributors = campaign.getJSONArray("contributors")
 
             for (i in 0 until contributors.length()) {
                 if (contributors.getJSONObject(i).getInt("id") == AppSettings.getUser()?.getInt("id")) {
                     viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
+                }
+            }
+        }
+
+        if (campaign.has("creator_id")) {
+            val crId = campaign.getJSONArray("creator_id")
+
+            for (i in 0 until crId.length()) {
+                if (crId.getInt(i) == AppSettings.getUser()?.getInt("id")) {
+                    viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
+                    viewHolder.favouritesBtn.isEnabled = false
                 }
             }
         }

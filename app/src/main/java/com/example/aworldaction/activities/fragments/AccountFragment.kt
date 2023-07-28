@@ -25,6 +25,7 @@ import org.json.JSONObject
 class AccountFragment : Fragment() {
     private var homeActivity: HomeActivity? = null
     private var nameDisplay: TextView? = null
+    private var roleDisplay: TextView? = null
     private var pictureDisplay: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +48,7 @@ class AccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         nameDisplay = view.findViewById(R.id.userName)
+        roleDisplay = view.findViewById(R.id.userRole)
         pictureDisplay = view.findViewById(R.id.userPicture)
 
         pictureDisplay?.setOnClickListener {
@@ -78,6 +80,13 @@ class AccountFragment : Fragment() {
             nameDisplay?.text = user?.getString("name")
         }
 
+        if (user.has("role_id")) {
+            roleDisplay?.text = resources.getString(
+                if (user.getInt("role_id") >= 2) R.string.role_admin
+                else R.string.role_user
+            )
+        }
+
         if (user.has("picture_path")) {
             val url = AppSettings.getStorageUrl(user.getString("picture_path"))
 
@@ -87,7 +96,7 @@ class AccountFragment : Fragment() {
                         .load(url)
                         .into(it)
                 } else {
-                    pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
+                    it.setImageResource(R.drawable.ic_baseline_account_circle_24)
                 }
             }
         }
