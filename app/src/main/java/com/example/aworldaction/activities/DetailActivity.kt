@@ -1,39 +1,28 @@
 package com.example.aworldaction.activities
 
 import android.content.Intent
-import android.opengl.Visibility
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toFile
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import com.bumptech.glide.Glide
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.auth.LoginActivity
 import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.adapters.CommentAdapter
 import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
+import com.example.aworldaction.managers.CampaignDetailManager
 import com.example.aworldaction.settings.AppSettings
-import org.json.JSONObject
 
 class DetailActivity : AppCompatActivity() {
-    private var campaign: JSONObject? = null
-    private var pictures = ArrayList<JSONObject>()
-    private var contributors = ArrayList<JSONObject>()
-    private var comments = ArrayList<JSONObject>()
-    private var picutresDisplay: ViewPager? = null
+    private var cdm: CampaignDetailManager? = null
+    private var picturesDisplay: ViewPager? = null
     private var contributorsDisplay: RecyclerView? = null
     private var commentsDisplay: RecyclerView? = null
     private var titleDisplay: TextView? = null
@@ -41,31 +30,35 @@ class DetailActivity : AppCompatActivity() {
     private var descriptionDisplay: TextView? = null
     private var statusImgDisplay: ImageView? = null
     private var statusTxtDisplay: TextView? = null
+    private var userPicture: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        picutresDisplay = findViewById(R.id.picturesDisplay)
+        cdm = CampaignDetailManager(this)
 
+        picturesDisplay = findViewById(R.id.picturesDisplay)
         contributorsDisplay = findViewById(R.id.contributorList)
         contributorsDisplay?.layoutManager = LinearLayoutManager(this)
-        contributorsDisplay?.adapter = ContributorAdapter(contributors, this)
-
         commentsDisplay = findViewById(R.id.commentList)
         commentsDisplay?.layoutManager = LinearLayoutManager(this)
-        commentsDisplay?.adapter = ContributorAdapter(comments, this)
+
+        cdm?.let {
+            contributorsDisplay?.adapter = ContributorAdapter(it.getContributors(), this)
+            commentsDisplay?.adapter = ContributorAdapter(it.getComments(), this)
+        }
 
         titleDisplay = findViewById(R.id.campaignTitle)
         localityDisplay = findViewById(R.id.localityDisplay)
         descriptionDisplay = findViewById(R.id.descriptionDisplay)
-
         statusImgDisplay = findViewById(R.id.statusImgDisplay)
         statusTxtDisplay = findViewById(R.id.statusTxtDisplay)
+        userPicture = findViewById<ImageView>(R.id.userPicture)
 
-        val campaingId = intent.getIntExtra("campaignId", 0)
-        if (campaingId != 0) {
-            loadCampaign(campaingId)
+        val campaignId = intent.getIntExtra("campaignId", 0)
+        if (campaignId != 0) {
+            cdm?.loadCampaign(campaignId)
         }
 
         val backBtn = findViewById<ImageButton>(R.id.backBtn)
@@ -76,15 +69,15 @@ class DetailActivity : AppCompatActivity() {
         val pictureBtn = findViewById<ImageButton>(R.id.pictureBtn)
         pictureBtn.setOnClickListener {
             val intent = Intent(this, UploadCampaignPictureActivity::class.java)
-            intent.putExtra("campaignId", campaingId)
+            intent.putExtra("campaignId", campaignId)
             startActivity(intent)
         }
 
-        val submitBtn = findViewById<ImageButton>(R.id.submitBtn)
+        val sendCommentBtn = findViewById<ImageButton>(R.id.sendCommentBtn)
         val commentText = findViewById<EditText>(R.id.commentText)
-        submitBtn.setOnClickListener {
-            if (campaign != null) {
-                sendComment(commentText.text.toString())
+        sendCommentBtn.setOnClickListener {
+            if (commentText.text.isNotBlank()) {
+                cdm?.sendComment(commentText.text.toString())
                 commentText.text.clear()
             }
         }
@@ -93,79 +86,30 @@ class DetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        campaign?.let {
+        cdm?.getCampaign()?.let {
             if (it.has("id")) {
-                loadCampaign(it.getInt("id"))
+                cdm?.loadCampaign(it.getInt("id"))
             }
         }
     }
 
-    private fun loadCampaign(campaingId: Int) {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/campaigns/$campaingId"
+    fun showCampaignData() {
+        cdm?.let {
+            val pictures = it.getPictures()
 
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("data")) {
-                val campaign = responseJSON.getJSONObject("data")
-
-                if (campaign.has("pictures")) {
-                    val pictures = campaign.getJSONArray("pictures")
-
-                    this.pictures.clear()
-                    for (i in 0 until pictures.length()) {
-                        this.pictures.add(pictures.getJSONObject(i))
-                    }
-                }
-
-                if (campaign.has("contributors")) {
-                    val contributors = campaign.getJSONArray("contributors")
-
-                    this.contributors.clear()
-                    for (i in 0 until contributors.length()) {
-                        this.contributors.add(contributors.getJSONObject(i))
-                    }
-                }
-
-                this.campaign = campaign
-                showCampaignData()
-                loadComments()
+            if (pictures.size > 0) {
+                val slideshowAdapter = SlideshowAdapter(pictures, this)
+                picturesDisplay?.adapter = slideshowAdapter
+                picturesDisplay?.visibility = View.VISIBLE
+            } else {
+                picturesDisplay?.visibility = View.GONE
             }
+
+            val contributorAdapter = ContributorAdapter(it.getContributors(), this)
+            contributorsDisplay?.adapter = contributorAdapter
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.GET, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
-                headers["Content-Type"] = "application/json"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-        requestQueue.add(request)
-    }
-
-    private fun showCampaignData() {
-        if (pictures.size > 0) {
-            val slideshowAdapter = SlideshowAdapter(pictures, this)
-            picutresDisplay?.adapter = slideshowAdapter
-            picutresDisplay?.visibility = View.VISIBLE
-        } else {
-            picutresDisplay?.visibility = View.GONE
-        }
-
-        val contributorAdapter = ContributorAdapter(contributors, this)
-        contributorsDisplay?.adapter = contributorAdapter
-
-        campaign?.let {
+        cdm?.getCampaign()?.let {
             if (it.has("name")) {
                 titleDisplay?.text = it.getString("name")
             }
@@ -204,77 +148,20 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadComments() {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/comments/filter/${campaign?.getInt("id")}"
+    fun showComments() {
+        userPicture?.let {
+            val user = AppSettings.getUser()
 
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("data")) {
-                val data = responseJSON.getJSONArray("data")
-
-                comments.clear()
-                for (i in 0 until data.length()) {
-                    comments.add(data.getJSONObject(i))
-                }
-
-                commentsDisplay?.adapter = CommentAdapter(comments, this)
+            if (user != null && user.has("picture_path")) {
+                val url = AppSettings.getStorageUrl(user.getString("picture_path"))
+                Glide.with(this)
+                    .load(url)
+                    .into(it)
             }
         }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
+        cdm?.let {
+            commentsDisplay?.adapter = CommentAdapter(it.getComments(), this)
         }
-
-        val request = object : StringRequest(
-            Method.GET, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
-                headers["Content-Type"] = "application/json"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-        requestQueue.add(request)
-    }
-
-    private fun sendComment(comment: String) {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/comments"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("data") || responseJSON.has("comment")) {
-                loadComments()
-            }
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.POST, url, listener, errorListener) {
-
-            override fun getParams(): MutableMap<String, String>? {
-                val params = HashMap<String, String>()
-                params["campaign_id"] = "${campaign?.getInt("id")}"
-                params["body"] = comment
-                return params
-            }
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-        requestQueue.add(request)
     }
 }
