@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -21,6 +22,7 @@ import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.auth.LoginActivity
 import com.example.aworldaction.activities.fragments.MapsFragment
+import com.example.aworldaction.adapters.CommentAdapter
 import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
 import com.example.aworldaction.settings.AppSettings
@@ -30,8 +32,10 @@ class DetailActivity : AppCompatActivity() {
     private var campaign: JSONObject? = null
     private var pictures = ArrayList<JSONObject>()
     private var contributors = ArrayList<JSONObject>()
+    private var comments = ArrayList<JSONObject>()
     private var picutresDisplay: ViewPager? = null
     private var contributorsDisplay: RecyclerView? = null
+    private var commentsDisplay: RecyclerView? = null
     private var titleDisplay: TextView? = null
     private var localityDisplay: TextView? = null
     private var descriptionDisplay: TextView? = null
@@ -47,6 +51,10 @@ class DetailActivity : AppCompatActivity() {
         contributorsDisplay = findViewById(R.id.contributorList)
         contributorsDisplay?.layoutManager = LinearLayoutManager(this)
         contributorsDisplay?.adapter = ContributorAdapter(contributors, this)
+
+        commentsDisplay = findViewById(R.id.commentList)
+        commentsDisplay?.layoutManager = LinearLayoutManager(this)
+        commentsDisplay?.adapter = ContributorAdapter(comments, this)
 
         titleDisplay = findViewById(R.id.campaignTitle)
         localityDisplay = findViewById(R.id.localityDisplay)
@@ -70,6 +78,15 @@ class DetailActivity : AppCompatActivity() {
             val intent = Intent(this, UploadCampaignPictureActivity::class.java)
             intent.putExtra("campaignId", campaingId)
             startActivity(intent)
+        }
+
+        val submitBtn = findViewById<ImageButton>(R.id.submitBtn)
+        val commentText = findViewById<EditText>(R.id.commentText)
+        submitBtn.setOnClickListener {
+            if (campaign != null) {
+                sendComment(commentText.text.toString())
+                commentText.text.clear()
+            }
         }
     }
 
@@ -113,6 +130,7 @@ class DetailActivity : AppCompatActivity() {
 
                 this.campaign = campaign
                 showCampaignData()
+                loadComments()
             }
         }
 
@@ -184,5 +202,79 @@ class DetailActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun loadComments() {
+        val requestQueue = Volley.newRequestQueue(this)
+        val url = AppSettings.getAPIUrl().toString() + "/comments/filter/${campaign?.getInt("id")}"
+
+        val listener = Response.Listener<String> { response ->
+            val responseJSON = JSONObject(response)
+
+            if (responseJSON.has("data")) {
+                val data = responseJSON.getJSONArray("data")
+
+                comments.clear()
+                for (i in 0 until data.length()) {
+                    comments.add(data.getJSONObject(i))
+                }
+
+                commentsDisplay?.adapter = CommentAdapter(comments, this)
+            }
+        }
+
+        val errorListener = Response.ErrorListener { error ->
+            Log.e("serverAPI", error.toString())
+            Log.e("serverAPI", error.networkResponse.statusCode.toString())
+        }
+
+        val request = object : StringRequest(
+            Method.GET, url, listener, errorListener) {
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer " + AppSettings.getToken()
+                headers["Content-Type"] = "application/json"
+                headers["Accept"] = "application/json"
+                return headers
+            }
+        }
+        requestQueue.add(request)
+    }
+
+    private fun sendComment(comment: String) {
+        val requestQueue = Volley.newRequestQueue(this)
+        val url = AppSettings.getAPIUrl().toString() + "/comments"
+
+        val listener = Response.Listener<String> { response ->
+            val responseJSON = JSONObject(response)
+
+            if (responseJSON.has("data") || responseJSON.has("comment")) {
+                loadComments()
+            }
+        }
+
+        val errorListener = Response.ErrorListener { error ->
+            Log.e("serverAPI", error.toString())
+            Log.e("serverAPI", error.networkResponse.statusCode.toString())
+        }
+
+        val request = object : StringRequest(
+            Method.POST, url, listener, errorListener) {
+
+            override fun getParams(): MutableMap<String, String>? {
+                val params = HashMap<String, String>()
+                params["campaign_id"] = "${campaign?.getInt("id")}"
+                params["body"] = comment
+                return params
+            }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer " + AppSettings.getToken()
+                headers["Accept"] = "application/json"
+                return headers
+            }
+        }
+        requestQueue.add(request)
     }
 }

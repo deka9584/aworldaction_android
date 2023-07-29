@@ -151,6 +151,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_box"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="12dp"
+                android:paddingHorizontal="24dp"
+                android:paddingVertical="12dp">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/userPicture"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_baseline_account_circle_24" />
+
+                <EditText
+                    android:id="@+id/commentText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginHorizontal="8dp"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="@color/white"
+                    android:hint="@string/insert_comment"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="8dp"/>
+
+                <ImageButton
+                    android:id="@+id/submitBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/rounded_box"
+                    android:backgroundTint="@color/green"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_baseline_add_comment_24"
+                    app:tint="@color/white" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/commentList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
         </LinearLayout>
     </ScrollView>
 
