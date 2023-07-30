@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
@@ -79,6 +80,7 @@ class DetailActivity : AppCompatActivity() {
             if (commentText.text.isNotBlank()) {
                 cdm?.sendComment(commentText.text.toString())
                 commentText.text.clear()
+                commentText.clearFocus()
             }
         }
     }
@@ -163,5 +165,24 @@ class DetailActivity : AppCompatActivity() {
         cdm?.let {
             commentsDisplay?.adapter = CommentAdapter(it.getComments(), this)
         }
+    }
+
+    fun showDeleteCommentDialog(commentId: Int) {
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle(resources.getString(R.string.delete_comment))
+        builder.setMessage(resources.getString(R.string.delete_comment_confirm))
+
+        builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
+            cdm?.deleteComment(commentId)
+            dialog.cancel()
+        }
+
+        builder.setNegativeButton(resources.getString(R.string.cancel_btn)) { dialog, which ->
+            dialog.cancel()
+        }
+
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 }

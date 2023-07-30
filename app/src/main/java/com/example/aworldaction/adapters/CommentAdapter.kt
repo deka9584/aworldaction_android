@@ -16,19 +16,24 @@ import com.example.aworldaction.R
 import com.example.aworldaction.activities.DetailActivity
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
+import org.w3c.dom.Text
 
 class CommentAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val userImage: ImageView
         val userName: TextView
         val commentText: TextView
+        val commentEdited: TextView
         val editBtn: ImageButton
+        val deleteBtn: ImageButton
 
         init {
             userImage = view.findViewById(R.id.userPicture)
             userName = view.findViewById(R.id.userName)
             commentText = view.findViewById(R.id.commentText)
+            commentEdited = view.findViewById(R.id.commentEdited)
             editBtn = view.findViewById(R.id.editBtn)
+            deleteBtn = view.findViewById(R.id.deleteBtn)
         }
     }
 
@@ -57,9 +62,17 @@ class CommentAdapter(private val dataSet: List<JSONObject>, private val context:
         }
 
         if (comment.has("user_id")) {
-            viewHolder.editBtn.visibility =
+            val buttonVisibility =
                 if (comment.getInt("user_id") == AppSettings.getUser()?.getInt("id")) View.VISIBLE
                 else View.GONE
+
+            viewHolder.editBtn.visibility = buttonVisibility
+            viewHolder.deleteBtn.visibility = buttonVisibility
+
+            viewHolder.deleteBtn.setOnClickListener {
+                val activity = context as? DetailActivity
+                activity?.showDeleteCommentDialog(comment.getInt("id"))
+            }
         }
     }
 

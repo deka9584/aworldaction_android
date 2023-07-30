@@ -53,4 +53,10 @@
     <string name="role_admin">Admin</string>
     <string name="role_user">User</string>
     <string name="insert_comment">Insert comment</string>
+    <string name="edited">Edited</string>
+    <string name="delete_comment">Delete comment</string>
+    <string name="delete_comment_confirm">Your comment can not be restored</string>
+    <string name="confirm_btn">Confirm</string>
+    <string name="cancel_btn">Cancel</string>
+    <string name="comment_list">Comments</string>
 </resources>

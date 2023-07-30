@@ -46,4 +46,10 @@
     <string name="role_admin">Amministratore</string>
     <string name="role_user">Utente</string>
     <string name="insert_comment">Inserisci commento</string>
+    <string name="edited">Modificato</string>
+    <string name="delete_comment">Elimina commento</string>
+    <string name="delete_comment_confirm">Il tuo commento non potrà essere ripristinato</string>
+    <string name="confirm_btn">Conferma</string>
+    <string name="cancel_btn">Annulla</string>
+    <string name="comment_list">Commenti</string>
 </resources>

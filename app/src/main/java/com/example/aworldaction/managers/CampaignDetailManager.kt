@@ -1,6 +1,7 @@
 package com.example.aworldaction.managers
 
 import android.util.Log
+import android.widget.Toast
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -114,6 +115,14 @@ class CampaignDetailManager(private val activity: DetailActivity) {
             if (responseJSON.has("data") || responseJSON.has("comment")) {
                 loadComments()
             }
+
+            if (responseJSON.has("message")) {
+                val message = responseJSON.getString("message")
+
+                Log.d("serverApi", message)
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+                loadComments()
+            }
         }
 
         val errorListener = Response.ErrorListener { error ->
@@ -130,6 +139,40 @@ class CampaignDetailManager(private val activity: DetailActivity) {
                 params["body"] = comment
                 return params
             }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
+                headers["Accept"] = "application/json"
+                return headers
+            }
+        }
+        requestQueue.add(request)
+    }
+
+    fun deleteComment(commentId: Int) {
+        val requestQueue = Volley.newRequestQueue(activity)
+        val url = AppSettings.getAPIUrl().toString() + "/comments/$commentId"
+
+        val listener = Response.Listener<String> { response ->
+            val responseJSON = JSONObject(response)
+
+            if (responseJSON.has("message")) {
+                val message = responseJSON.getString("message")
+
+                Log.d("serverApi", message)
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+                loadComments()
+            }
+        }
+
+        val errorListener = Response.ErrorListener { error ->
+            Log.e("serverAPI", error.toString())
+            Log.e("serverAPI", error.networkResponse.statusCode.toString())
+        }
+
+        val request = object : StringRequest(
+            Method.DELETE, url, listener, errorListener) {
+
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["Authorization"] = "Bearer ${AppSettings.getToken()}"

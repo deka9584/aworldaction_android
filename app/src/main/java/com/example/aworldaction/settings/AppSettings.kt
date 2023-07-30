@@ -5,14 +5,6 @@ import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.util.Log
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import com.android.volley.Response
-import com.android.volley.Response.ErrorListener
-import com.example.aworldaction.R
-import org.json.JSONException
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 import java.net.MalformedURLException
