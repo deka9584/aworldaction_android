@@ -44,6 +44,7 @@ class CommentAdapter(private val dataSet: List<JSONObject>, private val context:
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val comment = dataSet[position]
+        var loggedUserIsCreator = false
 
         if (comment.has("picture_path")) {
             val url = AppSettings.getStorageUrl(comment.getString("picture_path"))
@@ -62,17 +63,44 @@ class CommentAdapter(private val dataSet: List<JSONObject>, private val context:
         }
 
         if (comment.has("user_id")) {
-            val buttonVisibility =
-                if (comment.getInt("user_id") == AppSettings.getUser()?.getInt("id")) View.VISIBLE
-                else View.GONE
+            val loggedUser = AppSettings.getUser()
 
-            viewHolder.editBtn.visibility = buttonVisibility
-            viewHolder.deleteBtn.visibility = buttonVisibility
-
-            viewHolder.deleteBtn.setOnClickListener {
-                val activity = context as? DetailActivity
-                activity?.showDeleteCommentDialog(comment.getInt("id"))
+            if (loggedUser != null && loggedUser.has("id")) {
+                loggedUserIsCreator =
+                    comment.getInt("user_id") == loggedUser.getInt("id")
             }
+        }
+
+        if (comment.has("created_at") && comment.has("updated_at")) {
+            val createdAt = comment.getString("created_at")
+            val updatedAt = comment.getString("updated_at")
+
+            viewHolder.commentEdited.visibility =
+                if (!createdAt.equals(updatedAt)) View.VISIBLE else View.GONE
+        }
+
+        if (loggedUserIsCreator) {
+            val activity = context as? DetailActivity
+
+            viewHolder.editBtn.visibility = View.VISIBLE
+            viewHolder.editBtn.setOnClickListener {
+                if (comment.has("id") && comment.has("body")) {
+                    activity?.showEditCommentFragment(
+                        comment.getInt("id"),
+                        comment.getString("body")
+                    )
+                }
+            }
+
+            viewHolder.deleteBtn.visibility = View.VISIBLE
+            viewHolder.deleteBtn.setOnClickListener {
+                if (comment.has("id")) {
+                    activity?.showDeleteCommentDialog(comment.getInt("id"))
+                }
+            }
+        } else {
+            viewHolder.editBtn.visibility = View.GONE
+            viewHolder.deleteBtn.visibility = View.GONE
         }
     }
 

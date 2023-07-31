@@ -104,11 +104,14 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         if (campaign.has("creator_id")) {
             val crId = campaign.getJSONArray("creator_id")
+            val loggedUser = AppSettings.getUser()
 
-            for (i in 0 until crId.length()) {
-                if (crId.getInt(i) == AppSettings.getUser()?.getInt("id")) {
-                    viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
-                    viewHolder.favouritesBtn.isEnabled = false
+            if (loggedUser != null && loggedUser.has("id")) {
+                for (i in 0 until crId.length()) {
+                    if (crId.getInt(i) == AppSettings.getUser()?.getInt("id")) {
+                        viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
+                        viewHolder.favouritesBtn.isEnabled = false
+                    }
                 }
             }
         }

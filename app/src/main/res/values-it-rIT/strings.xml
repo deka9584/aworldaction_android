@@ -52,4 +52,6 @@
     <string name="confirm_btn">Conferma</string>
     <string name="cancel_btn">Annulla</string>
     <string name="comment_list">Commenti</string>
+    <string name="delete_picture">Elimina immagine</string>
+    <string name="delete_picture_confirm">L\'immagine non potrà essere ripristinata</string>
 </resources>

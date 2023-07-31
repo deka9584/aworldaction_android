@@ -17,6 +17,12 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="TransparentBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+
     <style name="register_btn">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

@@ -1,19 +1,21 @@
 package com.example.aworldaction.activities
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.activities.fragments.EditCommentFragment
 import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.adapters.CommentAdapter
 import com.example.aworldaction.adapters.ContributorAdapter
@@ -167,6 +169,11 @@ class DetailActivity : AppCompatActivity() {
         }
     }
 
+    fun showEditCommentFragment(commentId: Int, commentBody: String) {
+        val bottomSheetFragment = EditCommentFragment.newInstance(commentId, commentBody)
+        bottomSheetFragment.show(supportFragmentManager, "EditCommentFragmentTag")
+    }
+
     fun showDeleteCommentDialog(commentId: Int) {
         val builder = AlertDialog.Builder(this)
 
@@ -182,7 +189,24 @@ class DetailActivity : AppCompatActivity() {
             dialog.cancel()
         }
 
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
+        builder.create().show()
+    }
+
+    fun showDeletePictureDialog(pictureId: Int) {
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle(resources.getString(R.string.delete_picture))
+        builder.setMessage(resources.getString(R.string.delete_picture_confirm))
+
+        builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
+            cdm?.deletePicture(pictureId)
+            dialog.cancel()
+        }
+
+        builder.setNegativeButton(resources.getString(R.string.cancel_btn)) { dialog, which ->
+            dialog.cancel()
+        }
+
+        builder.create().show()
     }
 }
