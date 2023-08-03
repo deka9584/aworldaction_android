@@ -54,4 +54,5 @@
     <string name="comment_list">Commenti</string>
     <string name="delete_picture">Elimina immagine</string>
     <string name="delete_picture_confirm">L\'immagine non potrà essere ripristinata</string>
+    <string name="logout_confirm">Verrai disconnesso</string>
 </resources>

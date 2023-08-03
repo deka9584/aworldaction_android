@@ -25,6 +25,7 @@ import com.example.aworldaction.settings.AppSettings
 
 class DetailActivity : AppCompatActivity() {
     private var cdm: CampaignDetailManager? = null
+    private var editCommentFragment: EditCommentFragment? = null
     private var picturesDisplay: ViewPager? = null
     private var contributorsDisplay: RecyclerView? = null
     private var commentsDisplay: RecyclerView? = null
@@ -40,12 +41,17 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
 
         cdm = CampaignDetailManager(this)
+        editCommentFragment = EditCommentFragment()
 
         picturesDisplay = findViewById(R.id.picturesDisplay)
+
         contributorsDisplay = findViewById(R.id.contributorList)
         contributorsDisplay?.layoutManager = LinearLayoutManager(this)
+        contributorsDisplay?.isNestedScrollingEnabled = false
+
         commentsDisplay = findViewById(R.id.commentList)
         commentsDisplay?.layoutManager = LinearLayoutManager(this)
+        commentsDisplay?.isNestedScrollingEnabled = false
 
         cdm?.let {
             contributorsDisplay?.adapter = ContributorAdapter(it.getContributors(), this)
@@ -57,7 +63,7 @@ class DetailActivity : AppCompatActivity() {
         descriptionDisplay = findViewById(R.id.descriptionDisplay)
         statusImgDisplay = findViewById(R.id.statusImgDisplay)
         statusTxtDisplay = findViewById(R.id.statusTxtDisplay)
-        userPicture = findViewById<ImageView>(R.id.userPicture)
+        userPicture = findViewById(R.id.userPicture)
 
         val campaignId = intent.getIntExtra("campaignId", 0)
         if (campaignId != 0) {
@@ -170,8 +176,14 @@ class DetailActivity : AppCompatActivity() {
     }
 
     fun showEditCommentFragment(commentId: Int, commentBody: String) {
-        val bottomSheetFragment = EditCommentFragment.newInstance(commentId, commentBody)
-        bottomSheetFragment.show(supportFragmentManager, "EditCommentFragmentTag")
+        editCommentFragment?.setComment(commentId, commentBody)
+        editCommentFragment?.show(supportFragmentManager, "EditCommentFragmentTag")
+    }
+
+    fun confirmEditComment(commentId: Int, commentBody: String) {
+        cdm?.updateComment(commentId, commentBody)
+        editCommentFragment?.dismiss()
+        editCommentFragment?.setComment(0, "")
     }
 
     fun showDeleteCommentDialog(commentId: Int) {

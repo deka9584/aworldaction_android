@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -64,7 +65,7 @@ class AccountFragment : Fragment() {
 
         val logoutBtn = view.findViewById<Button>(R.id.logoutBtn)
         logoutBtn.setOnClickListener {
-            logout()
+            showLogoutDialog()
         }
     }
 
@@ -100,6 +101,24 @@ class AccountFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showLogoutDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+
+        builder.setTitle(resources.getString(R.string.logout_btn))
+        builder.setMessage(resources.getString(R.string.logout_confirm))
+
+        builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
+            logout()
+            dialog.cancel()
+        }
+
+        builder.setNegativeButton(resources.getString(R.string.cancel_btn)) { dialog, which ->
+            dialog.cancel()
+        }
+
+        builder.create().show()
     }
 
     private fun logout() {

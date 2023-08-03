@@ -149,6 +149,48 @@ class CampaignDetailManager(private val activity: DetailActivity) {
         requestQueue.add(request)
     }
 
+    fun updateComment(commentId: Int, commentText: String) {
+        val requestQueue = Volley.newRequestQueue(activity)
+        val url = AppSettings.getAPIUrl().toString() + "/comments/$commentId"
+
+        val listener = Response.Listener<String> { response ->
+            val responseJSON = JSONObject(response)
+
+            if (responseJSON.has("data") || responseJSON.has("comment")) {
+                loadComments()
+            }
+
+            if (responseJSON.has("message")) {
+                val message = responseJSON.getString("message")
+
+                Log.d("serverApi", message)
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        val errorListener = Response.ErrorListener { error ->
+            Log.e("serverAPI", error.toString())
+            Log.e("serverAPI", error.networkResponse.statusCode.toString())
+        }
+
+        val request = object : StringRequest(
+            Method.PUT, url, listener, errorListener) {
+
+            override fun getParams(): MutableMap<String, String> {
+                val params = HashMap<String, String>()
+                params["body"] = commentText
+                return params
+            }
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
+                headers["Accept"] = "application/json"
+                return headers
+            }
+        }
+        requestQueue.add(request)
+    }
+
     fun deleteComment(commentId: Int) {
         val requestQueue = Volley.newRequestQueue(activity)
         val url = AppSettings.getAPIUrl().toString() + "/comments/$commentId"

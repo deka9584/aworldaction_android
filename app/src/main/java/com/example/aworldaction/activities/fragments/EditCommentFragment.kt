@@ -24,18 +24,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import org.json.JSONObject
 
 class EditCommentFragment : BottomSheetDialogFragment() {
+    private var detailActivity: DetailActivity? = null
     private var commentId = 0
     private var commentBody = ""
     private var commentText: EditText? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            commentId = it.getInt(COMMENT_ID)
-            commentBody = it.getString(COMMENT_BODY, "")
-        }
-
         setStyle(STYLE_NORMAL, R.style.TransparentBottomSheetDialogTheme)
+
+        detailActivity = requireActivity() as? DetailActivity
     }
 
     override fun onCreateView(
@@ -72,66 +70,14 @@ class EditCommentFragment : BottomSheetDialogFragment() {
 
         val submitBtn = view.findViewById<ImageButton>(R.id.submitBtn)
         submitBtn.setOnClickListener {
-            if (commentBody != commentText?.text.toString()) {
-                saveComment()
+            if (commentBody != "${commentText?.text}") {
+                detailActivity?.confirmEditComment(commentId, "${commentText?.text}")
             }
-            Log.d("text", commentText?.text.toString())
         }
     }
 
-    private fun saveComment() {
-        val requestQueue = Volley.newRequestQueue(this.context)
-        val url = AppSettings.getAPIUrl().toString() + "/comments/$commentId"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("data") || responseJSON.has("comment")) {
-                dismiss()
-            }
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-
-                Log.d("serverApi", message)
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.PUT, url, listener, errorListener) {
-
-            override fun getParams(): MutableMap<String, String>? {
-                val params = HashMap<String, String>()
-                params["body"] = commentText?.text.toString()
-                return params
-            }
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-        requestQueue.add(request)
-    }
-
-    companion object {
-        private const val COMMENT_ID = "param1"
-        private const val COMMENT_BODY = "param2"
-
-        @JvmStatic
-        fun newInstance(param1: Int, param2: String) =
-            EditCommentFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(COMMENT_ID, param1)
-                    putString(COMMENT_BODY, param2)
-                }
-            }
+    fun setComment(commentId: Int, commentBody: String) {
+        this.commentId = commentId
+        this.commentBody = commentBody
     }
 }

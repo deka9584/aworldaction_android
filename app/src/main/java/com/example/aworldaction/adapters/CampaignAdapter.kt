@@ -7,11 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -150,12 +146,17 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
             if (responseJSON.has("message")) {
                 val message = responseJSON.getString("message")
-                if (message == "Campaign detached") {
-                    favouritesBtn.setImageResource(R.drawable.ic_baseline_star_border_24)
-                } else if (message == "Campaign attached") {
-                    favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
+
+                when (message) {
+                    "Campaign detached" -> {
+                        favouritesBtn.setImageResource(R.drawable.ic_baseline_star_border_24)
+                    }
+                    "Campaign attached" -> {
+                        favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
+                    }
                 }
 
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 Log.d("serverApi", responseJSON.getString("message"))
             }
         }
