@@ -55,4 +55,6 @@
     <string name="delete_picture">Elimina immagine</string>
     <string name="delete_picture_confirm">L\'immagine non potrà essere ripristinata</string>
     <string name="logout_confirm">Verrai disconnesso</string>
+    <string name="server_error">Impossibile connettersi al server</string>
+    <string name="retry_btn">Riprova</string>
 </resources>

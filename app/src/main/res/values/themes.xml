@@ -22,16 +22,22 @@
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 
+    <style name="spacer">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+    </style>
 
     <style name="register_btn">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
         <item name="backgroundTint">@color/light_green</item>
         <item name="android:text">@string/register_btn</item>
     </style>
 
     <style name="login_btn">
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="backgroundTint">@color/green</item>
         <item name="android:text">@string/login_btn</item>

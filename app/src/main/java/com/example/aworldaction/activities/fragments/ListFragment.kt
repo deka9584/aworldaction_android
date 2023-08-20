@@ -15,11 +15,12 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.adapters.CampaignAdapter
+import com.example.aworldaction.managers.ListFragmentManager
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
 class ListFragment : Fragment() {
-    private var campaginList = ArrayList<JSONObject>()
+    private var manager: ListFragmentManager? = null
     private var toShow: String? = null
     private var viewTitle: TextView? = null
     private var statusDisplay: TextView? = null
@@ -28,11 +29,13 @@ class ListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if (manager == null) {
+            manager = ListFragmentManager(this)
+        }
+
         arguments?.let {
             toShow = it.getString(TO_SHOW)
         }
-
-        loadList()
     }
 
     override fun onCreateView(
@@ -48,7 +51,7 @@ class ListFragment : Fragment() {
 
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
         swipeRefreshLayout.setOnRefreshListener {
-            loadList()
+            manager?.loadList(toShow)
             swipeRefreshLayout.isRefreshing = false
         }
 
@@ -56,7 +59,10 @@ class ListFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.campaignList)
         recyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView?.adapter = CampaignAdapter(campaginList, requireContext())
+
+        manager?.getCampaignList()?.let {
+            recyclerView?.adapter = CampaignAdapter(it, requireContext())
+        }
 
         viewTitle = view.findViewById(R.id.viewTitle)
         viewTitle?.text = when (toShow) {
@@ -65,59 +71,27 @@ class ListFragment : Fragment() {
             "completed" -> resources.getString(R.string.list_completed)
             else -> "List"
         }
+
+        manager?.loadList(toShow)
     }
 
-    private fun loadList() {
-        val requestQueue = Volley.newRequestQueue(this.context)
-        val api = AppSettings.getAPIUrl().toString()
-        val url = when (toShow) {
-            "inprogress" -> "$api/inprogress"
-            "favourites" -> "$api/favourites"
-            "completed" -> "$api/completed"
-            else -> return
+    fun displayList(list: ArrayList<JSONObject>) {
+        context?.let {
+            recyclerView?.adapter = CampaignAdapter(list, it)
         }
 
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("data")) {
-                val campaigns = responseJSON.getJSONArray("data")
-
-                campaginList.clear()
-
-                for (i in 0 until campaigns.length()) {
-                    campaginList.add(campaigns.getJSONObject(i))
-                }
-
-                recyclerView?.adapter = CampaignAdapter(campaginList, requireContext())
-
-                if (campaginList.size == 0) {
-                    statusDisplay?.visibility = View.VISIBLE
-                    statusDisplay?.text = resources.getString(R.string.list_empty)
-                } else {
-                    statusDisplay?.visibility = View.INVISIBLE
-                }
-            }
+        if (list.size == 0) {
+            statusDisplay?.visibility = View.VISIBLE
+            statusDisplay?.text = resources.getString(R.string.list_empty)
+        } else {
+            statusDisplay?.visibility = View.INVISIBLE
         }
+    }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.GET, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
-                headers["Content-Type"] = "application/json"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        requestQueue.add(request)
+    fun displayError(message: String) {
+        statusDisplay?.visibility = View.VISIBLE
+        statusDisplay?.text = message
+        statusDisplay?.setTextColor(resources.getColor(R.color.danger, context?.theme))
     }
 
     companion object {

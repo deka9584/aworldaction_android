@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.isVisible
+import com.android.volley.NoConnectionError
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
@@ -20,6 +22,8 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
+    private var authOptionsView: LinearLayout? = null
+    private var connectionErrorView: LinearLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,21 +33,31 @@ class MainActivity : AppCompatActivity() {
         AppSettings.init(this)
 
         progressBar = findViewById(R.id.progressBar)
+        authOptionsView = findViewById(R.id.authOptionsView)
+        connectionErrorView = findViewById(R.id.connectionErrorView)
 
-        val loginBtn: Button = findViewById(R.id.loginBtn)
-        val registerBtn: Button = findViewById(R.id.registerBtn)
+        val loginBtn = findViewById<Button>(R.id.loginBtn)
+        val registerBtn = findViewById<Button>(R.id.registerBtn)
+        val retryBtn = findViewById<Button>(R.id.retryBtn)
 
-        loginBtn.setOnClickListener {
-            if (progressBar?.visibility == View.INVISIBLE) {
+        loginBtn?.setOnClickListener {
+            if (progressBar?.isVisible == false) {
                 val intent = Intent(this, LoginActivity::class.java)
                 startActivity(intent)
             }
         }
 
-        registerBtn.setOnClickListener {
-            if (progressBar?.visibility == View.INVISIBLE) {
+        registerBtn?.setOnClickListener {
+            if (progressBar?.isVisible == false) {
                 val intent = Intent(this, RegisterActivity::class.java)
                 startActivity(intent)
+            }
+        }
+
+        retryBtn.setOnClickListener {
+            if (progressBar?.isVisible == false) {
+                showConnectionError(false)
+                setupUser()
             }
         }
     }
@@ -53,16 +67,27 @@ class MainActivity : AppCompatActivity() {
         setupUser()
     }
 
-    private fun showHomeActivity() {
+    private fun launchHomeActivity() {
         val intent = Intent(this, HomeActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         startActivity(intent)
+    }
+
+    private fun showAuthOptions(show: Boolean) {
+        progressBar?.visibility = View.GONE
+        authOptionsView?.visibility = if (show) View.VISIBLE else View.INVISIBLE
+    }
+
+    private fun showConnectionError(show: Boolean) {
+        progressBar?.visibility = View.GONE
+        connectionErrorView?.visibility = if (show) View.VISIBLE else View.INVISIBLE
     }
 
     private fun setupUser() {
         val userToken = AppSettings.getToken()
 
         if (userToken == null || userToken == "") {
+            showAuthOptions(true)
             return
         }
 
@@ -77,16 +102,19 @@ class MainActivity : AppCompatActivity() {
 
                 AppSettings.setUser(user)
                 Log.d("user", user.toString())
-                showHomeActivity()
+                launchHomeActivity()
             }
-
-            progressBar?.visibility = View.INVISIBLE
         }
 
         val errorListener = Response.ErrorListener { error ->
-            progressBar?.visibility = View.INVISIBLE
+            if (error is NoConnectionError) {
+                showConnectionError(true)
+            } else {
+                AppSettings.setToken(null)
+                showAuthOptions(true)
+            }
+
             Log.e("serverAPI", error.toString())
-            AppSettings.setToken(null)
         }
 
         val request = object : StringRequest(
