@@ -52,6 +52,10 @@ object AppSettings {
         return user
     }
 
+    fun getUserID(): Int {
+        return user?.optInt("id") ?: 0
+    }
+
     fun setUser(user: JSONObject?) {
         this.user = user
     }

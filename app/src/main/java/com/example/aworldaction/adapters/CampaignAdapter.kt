@@ -3,22 +3,19 @@ package com.example.aworldaction.adapters
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.DetailActivity
+import com.example.aworldaction.activities.clients.ContentApiClient
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
-class CampaignAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CampaignAdapter.ViewHolder>() {
+class CampaignAdapter(private var dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CampaignAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView
         val progress: TextView
@@ -90,24 +87,29 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
 
         if (campaign.has("contributors")) {
             val contributors = campaign.getJSONArray("contributors")
+            var isUserContributor = false
 
             for (i in 0 until contributors.length()) {
-                if (contributors.getJSONObject(i).getInt("id") == AppSettings.getUser()?.getInt("id")) {
-                    viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
+                if (contributors.getJSONObject(i).getInt("id") == AppSettings.getUserID()) {
+                    isUserContributor = true
+                    break
                 }
             }
+
+            viewHolder.favouritesBtn.setImageResource(
+                if (isUserContributor) R.drawable.ic_baseline_star_24
+                else R.drawable.ic_baseline_star_border_24
+            )
         }
 
         if (campaign.has("creator_id")) {
             val crId = campaign.getJSONArray("creator_id")
-            val loggedUser = AppSettings.getUser()
 
-            if (loggedUser != null && loggedUser.has("id")) {
-                for (i in 0 until crId.length()) {
-                    if (crId.getInt(i) == AppSettings.getUser()?.getInt("id")) {
-                        viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
-                        viewHolder.favouritesBtn.isEnabled = false
-                    }
+            for (i in 0 until crId.length()) {
+                if (crId.getInt(i) == AppSettings.getUserID()) {
+                    viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
+                    viewHolder.favouritesBtn.isEnabled = false
+                    break
                 }
             }
         }
@@ -138,15 +140,8 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
     }
 
     private fun toggleFavourites(campaignId: Int, favouritesBtn: ImageButton) {
-        val requestQueue = Volley.newRequestQueue(context)
-        val url = AppSettings.getAPIUrl().toString() + "/relate-campaign/logged"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-
+        ContentApiClient.toggleCampaignFavourite(context, campaignId,
+            onSuccess = { message ->
                 when (message) {
                     "Campaign detached" -> {
                         favouritesBtn.setImageResource(R.drawable.ic_baseline_star_border_24)
@@ -155,33 +150,16 @@ class CampaignAdapter(private val dataSet: List<JSONObject>, private val context
                         favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
                     }
                 }
-
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-                Log.d("serverApi", responseJSON.getString("message"))
+            },
+            onError = { message ->
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
-        }
+        )
+    }
 
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.POST, url, listener, errorListener) {
-
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["campaign_id"] = "$campaignId"
-                return params
-            }
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer " + AppSettings.getToken()
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        requestQueue.add(request)
+    fun setData(newList: List<JSONObject>) {
+        dataSet = newList
+        notifyDataSetChanged()
     }
 }

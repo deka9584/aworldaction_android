@@ -1,7 +1,6 @@
 package com.example.aworldaction.activities.auth
 
 import android.content.Intent
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,15 +10,9 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.view.isVisible
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.MainActivity
-import com.example.aworldaction.requests.RequestsHelper
+import com.example.aworldaction.activities.clients.AuthApiClient
 import com.example.aworldaction.settings.AppSettings
-import org.json.JSONObject
 
 class LoginActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
@@ -63,54 +56,35 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun sendLoginRequest(email: String, password: String) {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/login"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("token")) {
-                val token = responseJSON.getString("token")
-                AppSettings.setToken(token)
-                Log.d("token", token)
-            }
-
-            if (responseJSON.has("user")) {
-                val user = responseJSON.getJSONObject("user")
-                AppSettings.setUser(user)
-                finish()
-            }
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-                authStatus?.text = message
-                authStatus?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = RequestsHelper.getErrorListener(this, authStatus, progressBar)
-
-        val request = object : StringRequest(
-            Method.POST, url, listener, errorListener) {
-
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["email"] = email
-                params["password"] = password
-                return params
-            }
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
+        val params = HashMap<String, String>()
+        params["email"] = email
+        params["password"] = password
 
         progressBar?.visibility = View.VISIBLE
-        requestQueue.add(request)
+
+        AuthApiClient.login(this, params,
+            onSuccess = { response ->
+                val token = response.optString("token")
+                val user = response.optJSONObject("user")
+
+                user?.let {
+                    AppSettings.setToken(token)
+                    AppSettings.setUser(user)
+
+                    Log.d("usrToken", token)
+                    finish()
+                }
+
+                authStatus?.text = response.optString("message")
+                authStatus?.setTextColor(getColor(R.color.green))
+                progressBar?.visibility = View.INVISIBLE
+            },
+            onError = { message ->
+                authStatus?.text = message
+                authStatus?.setTextColor(getColor(R.color.red))
+                progressBar?.visibility = View.INVISIBLE
+            }
+        )
     }
 
     private fun resetFields() {

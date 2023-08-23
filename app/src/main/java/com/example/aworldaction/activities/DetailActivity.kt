@@ -1,13 +1,9 @@
 package com.example.aworldaction.activities
 
-import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,11 +16,11 @@ import com.example.aworldaction.activities.fragments.MapsFragment
 import com.example.aworldaction.adapters.CommentAdapter
 import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
-import com.example.aworldaction.managers.CampaignDetailManager
+import com.example.aworldaction.models.CampaignDetailModel
 import com.example.aworldaction.settings.AppSettings
 
 class DetailActivity : AppCompatActivity() {
-    private var cdm: CampaignDetailManager? = null
+    private var model: CampaignDetailModel? = null
     private var editCommentFragment: EditCommentFragment? = null
     private var picturesDisplay: ViewPager? = null
     private var contributorsDisplay: RecyclerView? = null
@@ -40,7 +36,7 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        cdm = CampaignDetailManager(this)
+        model = CampaignDetailModel(this)
         editCommentFragment = EditCommentFragment()
 
         picturesDisplay = findViewById(R.id.picturesDisplay)
@@ -53,7 +49,7 @@ class DetailActivity : AppCompatActivity() {
         commentsDisplay?.layoutManager = LinearLayoutManager(this)
         commentsDisplay?.isNestedScrollingEnabled = false
 
-        cdm?.let {
+        model?.let {
             contributorsDisplay?.adapter = ContributorAdapter(it.getContributors(), this)
             commentsDisplay?.adapter = ContributorAdapter(it.getComments(), this)
         }
@@ -67,7 +63,7 @@ class DetailActivity : AppCompatActivity() {
 
         val campaignId = intent.getIntExtra("campaignId", 0)
         if (campaignId != 0) {
-            cdm?.loadCampaign(campaignId)
+            model?.loadCampaign(campaignId)
         }
 
         val backBtn = findViewById<ImageButton>(R.id.backBtn)
@@ -86,7 +82,7 @@ class DetailActivity : AppCompatActivity() {
         val commentText = findViewById<EditText>(R.id.commentText)
         sendCommentBtn.setOnClickListener {
             if (commentText.text.isNotBlank()) {
-                cdm?.sendComment(commentText.text.toString())
+                model?.sendComment(commentText.text.toString())
                 commentText.text.clear()
                 commentText.clearFocus()
             }
@@ -96,15 +92,15 @@ class DetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        cdm?.getCampaign()?.let {
+        model?.getCampaign()?.let {
             if (it.has("id")) {
-                cdm?.loadCampaign(it.getInt("id"))
+                model?.loadCampaign(it.getInt("id"))
             }
         }
     }
 
     fun showCampaignData() {
-        cdm?.let {
+        model?.let {
             val pictures = it.getPictures()
 
             if (pictures.size > 0) {
@@ -119,7 +115,7 @@ class DetailActivity : AppCompatActivity() {
             contributorsDisplay?.adapter = contributorAdapter
         }
 
-        cdm?.getCampaign()?.let {
+        model?.getCampaign()?.let {
             if (it.has("name")) {
                 titleDisplay?.text = it.getString("name")
             }
@@ -170,7 +166,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
-        cdm?.let {
+        model?.let {
             commentsDisplay?.adapter = CommentAdapter(it.getComments(), this)
         }
     }
@@ -181,7 +177,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     fun confirmEditComment(commentId: Int, commentBody: String) {
-        cdm?.updateComment(commentId, commentBody)
+        model?.updateComment(commentId, commentBody)
         editCommentFragment?.dismiss()
         editCommentFragment?.setComment(0, "")
     }
@@ -193,7 +189,7 @@ class DetailActivity : AppCompatActivity() {
         builder.setMessage(resources.getString(R.string.delete_comment_confirm))
 
         builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
-            cdm?.deleteComment(commentId)
+            model?.deleteComment(commentId)
             dialog.cancel()
         }
 
@@ -211,7 +207,7 @@ class DetailActivity : AppCompatActivity() {
         builder.setMessage(resources.getString(R.string.delete_picture_confirm))
 
         builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
-            cdm?.deletePicture(pictureId)
+            model?.deletePicture(pictureId)
             dialog.cancel()
         }
 

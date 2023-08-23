@@ -1,4 +1,4 @@
-package com.example.aworldaction.managers
+package com.example.aworldaction.models
 
 import android.util.Log
 import android.widget.Toast
@@ -9,7 +9,7 @@ import com.example.aworldaction.activities.DetailActivity
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
-class CampaignDetailManager(private val activity: DetailActivity) {
+class CampaignDetailModel(private val activity: DetailActivity) {
     private var campaign: JSONObject? = null
     private val pictures = ArrayList<JSONObject>()
     private val contributors = ArrayList<JSONObject>()

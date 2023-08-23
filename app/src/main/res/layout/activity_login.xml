@@ -29,43 +29,50 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <ScrollView
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="12dp"
+        android:fillViewport="true"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/viewTitleArea">
 
-        <EditText
-            android:id="@+id/userField"
-            style="@style/login_edittext_user"
-            android:hint="@string/login_user_hint"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <EditText
-            android:id="@+id/passwordField"
-            style="@style/login_edittext_password"
-            android:hint="@string/login_password_hint"/>
+            <EditText
+                android:id="@+id/userField"
+                style="@style/login_edittext_user"
+                android:hint="@string/login_user_hint" />
 
-        <Button
-            android:id="@+id/loginBtn"
-            style="@style/login_next_btn"
-            android:text="@string/login_btn" />
+            <EditText
+                android:id="@+id/passwordField"
+                style="@style/login_edittext_password"
+                android:hint="@string/login_password_hint" />
 
-        <TextView
-            android:id="@+id/authStatus"
-            style="@style/text_status"
-            android:text="" />
+            <Button
+                android:id="@+id/loginBtn"
+                style="@style/login_next_btn"
+                android:text="@string/login_btn" />
 
-        <TextView
-            android:id="@+id/newAccountLink"
-            style="@style/text_link"
-            android:text="@string/new_account_link" />
+            <TextView
+                android:id="@+id/authStatus"
+                style="@style/text_status"
+                android:text="" />
 
-    </LinearLayout>
+            <TextView
+                android:id="@+id/newAccountLink"
+                style="@style/text_link"
+                android:text="@string/new_account_link" />
+        </LinearLayout>
+    </ScrollView>
 
     <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/progressBar"
