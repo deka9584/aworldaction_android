@@ -1,4 +1,4 @@
-package com.example.aworldaction.activities.fragments
+package com.example.aworldaction.fragments
 
 import android.content.Intent
 import android.net.Uri
@@ -12,13 +12,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.example.aworldaction.R
-
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment() {
     private var position: LatLng? = null

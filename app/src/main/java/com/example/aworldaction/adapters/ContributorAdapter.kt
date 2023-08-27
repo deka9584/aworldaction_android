@@ -9,10 +9,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
 import com.example.aworldaction.settings.AppSettings
-import de.hdodenhof.circleimageview.CircleImageView
 import org.json.JSONObject
 
-class ContributorAdapter(private val contributors: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>() {
+class ContributorAdapter(private var dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<ContributorAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val image: ImageView
         val name: TextView
@@ -29,7 +28,7 @@ class ContributorAdapter(private val contributors: List<JSONObject>, private val
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
-        val contributorJSON = contributors[position]
+        val contributorJSON = dataSet[position]
 
         if (contributorJSON.has("name")) {
             val name = contributorJSON.getString("name")
@@ -51,6 +50,11 @@ class ContributorAdapter(private val contributors: List<JSONObject>, private val
     }
 
     override fun getItemCount(): Int {
-        return contributors.size
+        return dataSet.size
+    }
+
+    fun setData(newList: List<JSONObject>) {
+        dataSet = newList
+        notifyDataSetChanged()
     }
 }

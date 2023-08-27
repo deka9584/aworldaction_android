@@ -1,26 +1,30 @@
 package com.example.aworldaction.activities
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.fragments.EditCommentFragment
-import com.example.aworldaction.activities.fragments.MapsFragment
+import com.example.aworldaction.fragments.EditCommentFragment
+import com.example.aworldaction.fragments.MapsFragment
 import com.example.aworldaction.adapters.CommentAdapter
 import com.example.aworldaction.adapters.ContributorAdapter
 import com.example.aworldaction.adapters.SlideshowAdapter
-import com.example.aworldaction.models.CampaignDetailModel
+import com.example.aworldaction.models.DetailActivityModel
 import com.example.aworldaction.settings.AppSettings
+import org.json.JSONObject
 
 class DetailActivity : AppCompatActivity() {
-    private var model: CampaignDetailModel? = null
+    private lateinit var model: DetailActivityModel
+    private var campaignId = 0
     private var editCommentFragment: EditCommentFragment? = null
     private var picturesDisplay: ViewPager? = null
     private var contributorsDisplay: RecyclerView? = null
@@ -36,24 +40,14 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        model = CampaignDetailModel(this)
+        if (!::model.isInitialized) {
+            model = ViewModelProvider(this)[DetailActivityModel::class.java]
+        }
+
+        campaignId = intent.getIntExtra("campaignId", 0)
         editCommentFragment = EditCommentFragment()
 
         picturesDisplay = findViewById(R.id.picturesDisplay)
-
-        contributorsDisplay = findViewById(R.id.contributorList)
-        contributorsDisplay?.layoutManager = LinearLayoutManager(this)
-        contributorsDisplay?.isNestedScrollingEnabled = false
-
-        commentsDisplay = findViewById(R.id.commentList)
-        commentsDisplay?.layoutManager = LinearLayoutManager(this)
-        commentsDisplay?.isNestedScrollingEnabled = false
-
-        model?.let {
-            contributorsDisplay?.adapter = ContributorAdapter(it.getContributors(), this)
-            commentsDisplay?.adapter = ContributorAdapter(it.getComments(), this)
-        }
-
         titleDisplay = findViewById(R.id.campaignTitle)
         localityDisplay = findViewById(R.id.localityDisplay)
         descriptionDisplay = findViewById(R.id.descriptionDisplay)
@@ -61,9 +55,35 @@ class DetailActivity : AppCompatActivity() {
         statusTxtDisplay = findViewById(R.id.statusTxtDisplay)
         userPicture = findViewById(R.id.userPicture)
 
-        val campaignId = intent.getIntExtra("campaignId", 0)
+        contributorsDisplay = findViewById(R.id.contributorList)
+        contributorsDisplay?.layoutManager = LinearLayoutManager(this)
+        contributorsDisplay?.isNestedScrollingEnabled = false
+        contributorsDisplay?.adapter = ContributorAdapter(emptyList(), this)
+
+        commentsDisplay = findViewById(R.id.commentList)
+        commentsDisplay?.layoutManager = LinearLayoutManager(this)
+        commentsDisplay?.isNestedScrollingEnabled = false
+        commentsDisplay?.adapter = CommentAdapter(emptyList(), this)
+
+        model.campaign.observe(this, Observer { campaign ->
+            showCampaign(campaign)
+        })
+
+        model.pictures.observe(this, Observer { pictures ->
+            picturesDisplay?.adapter = SlideshowAdapter(pictures, this)
+            picturesDisplay?.visibility = if (pictures.isEmpty()) View.GONE else View.VISIBLE
+        })
+
+        model.contributors.observe(this, Observer { contributors ->
+            (contributorsDisplay?.adapter as? ContributorAdapter)?.setData(contributors)
+        })
+
+        model.comments.observe(this, Observer { comments ->
+            showComments(comments)
+        })
+
         if (campaignId != 0) {
-            model?.loadCampaign(campaignId)
+            model.loadCampaign(this, campaignId)
         }
 
         val backBtn = findViewById<ImageButton>(R.id.backBtn)
@@ -82,7 +102,7 @@ class DetailActivity : AppCompatActivity() {
         val commentText = findViewById<EditText>(R.id.commentText)
         sendCommentBtn.setOnClickListener {
             if (commentText.text.isNotBlank()) {
-                model?.sendComment(commentText.text.toString())
+                model.sendComment(this, campaignId, commentText.text.toString())
                 commentText.text.clear()
                 commentText.clearFocus()
             }
@@ -92,83 +112,54 @@ class DetailActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        model?.getCampaign()?.let {
-            if (it.has("id")) {
-                model?.loadCampaign(it.getInt("id"))
-            }
-        }
+        model.loadCampaign(this, campaignId)
     }
 
-    fun showCampaignData() {
-        model?.let {
-            val pictures = it.getPictures()
+    private fun showCampaign(campaign: JSONObject) {
+        titleDisplay?.text = campaign.optString("name")
+        localityDisplay?.text = campaign.optString("location_name")
+        descriptionDisplay?.text = campaign.optString("description")
 
-            if (pictures.size > 0) {
-                val slideshowAdapter = SlideshowAdapter(pictures, this)
-                picturesDisplay?.adapter = slideshowAdapter
-                picturesDisplay?.visibility = View.VISIBLE
-            } else {
-                picturesDisplay?.visibility = View.GONE
-            }
+        if (campaign.has("location_lat") || campaign.has("location_lng")) {
+            val lat = campaign.getDouble("location_lat")
+            val lng = campaign.getDouble("location_lng")
 
-            val contributorAdapter = ContributorAdapter(it.getContributors(), this)
-            contributorsDisplay?.adapter = contributorAdapter
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.mapsFragment, MapsFragment.newInstance(lat, lng))
+                .commit()
         }
 
-        model?.getCampaign()?.let {
-            if (it.has("name")) {
-                titleDisplay?.text = it.getString("name")
-            }
-
-            if (it.has("location_name")) {
-                localityDisplay?.text = it.getString("location_name")
-            }
-
-            if (it.has("description")) {
-                descriptionDisplay?.text = it.getString("description")
-            }
-
-            if (it.has("location_lat") || it.has("location_lng")) {
-                val lat = it.getDouble("location_lat")
-                val lng = it.getDouble("location_lng")
-
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.mapsFragment, MapsFragment.newInstance(lat, lng))
-                    .commit()
-            }
-
-            if (it.has("completed")) {
-                if (it.getInt("completed") == 1) {
-                    statusImgDisplay?.setImageResource(R.drawable.ic_baseline_done_all_24)
-                    statusImgDisplay?.setColorFilter(resources.getColor(R.color.green, theme))
-                    statusTxtDisplay?.text = resources.getString(R.string.campaign_completed)
-                    statusTxtDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-                } else {
-                    statusImgDisplay?.setImageResource(R.drawable.ic_baseline_access_time_24)
-                    statusImgDisplay?.setColorFilter(resources.getColor(R.color.orange, theme))
-                    statusTxtDisplay?.text = resources.getString(R.string.campaign_inprogress)
-                    statusTxtDisplay?.setTextColor(resources.getColor(R.color.orange, theme))
-                }
-            }
+        if (campaign.optInt("completed") == 1) {
+            statusImgDisplay?.setImageResource(R.drawable.ic_baseline_done_all_24)
+            statusImgDisplay?.setColorFilter(getColor(R.color.green))
+            statusTxtDisplay?.text = resources.getString(R.string.campaign_completed)
+            statusTxtDisplay?.setTextColor(getColor(R.color.green))
+        } else {
+            statusImgDisplay?.setImageResource(R.drawable.ic_baseline_access_time_24)
+            statusImgDisplay?.setColorFilter(getColor(R.color.orange))
+            statusTxtDisplay?.text = resources.getString(R.string.campaign_inprogress)
+            statusTxtDisplay?.setTextColor(getColor(R.color.orange))
         }
+
+        model.loadComments(this, campaignId)
     }
 
-    fun showComments() {
+    private fun showComments(comments: List<JSONObject>) {
         userPicture?.let {
-            val user = AppSettings.getUser()
+            val path = AppSettings.getUser()?.optString("picture_path")
 
-            if (user != null && user.has("picture_path")) {
-                val url = AppSettings.getStorageUrl(user.getString("picture_path"))
+            if (path != null && path.isNotBlank()) {
+                val url = AppSettings.getStorageUrl(path)
                 Glide.with(this)
                     .load(url)
                     .into(it)
+            } else {
+                it.setImageResource(R.drawable.ic_baseline_account_circle_24)
             }
         }
 
-        model?.let {
-            commentsDisplay?.adapter = CommentAdapter(it.getComments(), this)
-        }
+        (commentsDisplay?.adapter as? CommentAdapter)?.setData(comments)
     }
 
     fun showEditCommentFragment(commentId: Int, commentBody: String) {
@@ -177,7 +168,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     fun confirmEditComment(commentId: Int, commentBody: String) {
-        model?.updateComment(commentId, commentBody)
+        model.updateComment(this, commentId, commentBody)
         editCommentFragment?.dismiss()
         editCommentFragment?.setComment(0, "")
     }
@@ -189,7 +180,7 @@ class DetailActivity : AppCompatActivity() {
         builder.setMessage(resources.getString(R.string.delete_comment_confirm))
 
         builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
-            model?.deleteComment(commentId)
+            model.deleteComment(this, commentId)
             dialog.cancel()
         }
 
@@ -207,7 +198,7 @@ class DetailActivity : AppCompatActivity() {
         builder.setMessage(resources.getString(R.string.delete_picture_confirm))
 
         builder.setPositiveButton(resources.getString(R.string.confirm_btn)) { dialog, which ->
-            model?.deletePicture(pictureId)
+            model?.deletePicture(this, pictureId)
             dialog.cancel()
         }
 

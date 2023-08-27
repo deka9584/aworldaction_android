@@ -21,6 +21,7 @@ import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.clients.AuthApiClient
 import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
@@ -84,17 +85,16 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
 
     private fun updatePicture() {
         val user = AppSettings.getUser()
-        if (user?.has("picture_path") == true) {
-            val url = AppSettings.getStorageUrl(user.getString("picture_path"))
+        val path = user?.optString("picture_path") ?: ""
+        val url = if (path.isNotBlank()) AppSettings.getStorageUrl(path) else null
 
-            pictureDisplay?.let {
-                if (url != null) {
-                    Glide.with(this)
-                        .load(url)
-                        .into(it)
-                } else {
-                    pictureDisplay?.setImageResource(R.drawable.ic_baseline_account_circle_24)
-                }
+        pictureDisplay?.let {
+            if (url != null) {
+                Glide.with(this)
+                    .load(url)
+                    .into(it)
+            } else {
+                pictureDisplay?.setImageResource(R.color.transparent)
             }
         }
     }
@@ -108,104 +108,46 @@ class UploadPhotoProfileActivity : AppCompatActivity() {
     }
 
     private fun uploadImage(image: Drawable) {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
-        val imageData = AppSettings.getFileDataFromDrawable(image)
-
-        val listener = Response.Listener<NetworkResponse> { response ->
-            val resultResponse = String(response.data)
-            val result = JSONObject(resultResponse)
-
-            if (result.has("message")) {
-                statusDisplay?.text = result.getString("message")
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            if (result.has("user")) {
-                AppSettings.setUser(result.getJSONObject("user"))
-                updatePicture()
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
-
-        val request = object : VolleyMultipartRequest(
-            url,
-            listener,
-            errorListener
-        ) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        imageData?.let {
-            val params = HashMap<String, VolleyMultipartRequest.DataPart>()
-            params["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
-            request.setByteData(params)
-        }
-
-        requestQueue.add(request)
         progressBar?.visibility = View.VISIBLE
+
+        AuthApiClient.updateProfilePicture(this, image,
+            onSuccess = { response ->
+                response.optJSONObject("user")?.let {
+                    AppSettings.setUser((it))
+                    updatePicture()
+                }
+
+                statusDisplay?.text = response.optString("message")
+                statusDisplay?.setTextColor(getColor(R.color.green))
+                progressBar?.visibility = View.INVISIBLE
+            },
+            onError = { message ->
+                statusDisplay?.text = message
+                statusDisplay?.setTextColor(getColor(R.color.red))
+                progressBar?.visibility = View.INVISIBLE
+            }
+        )
     }
 
     private fun deleteImage() {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/loggeduser/picture"
+        progressBar?.visibility = View.VISIBLE
 
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-                statusDisplay?.text = message
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            if (responseJSON.has("user")) {
-                AppSettings.setUser(responseJSON.getJSONObject("user"))
-                updatePicture()
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-
-            if (listOf(401, 403, 422).contains(error.networkResponse.statusCode)) {
-                val responseString = String(error.networkResponse?.data ?: byteArrayOf())
-                try {
-                    val jsonResponse = JSONObject(responseString)
-                    val errorMessage = jsonResponse.getString("message")
-                    statusDisplay?.text = errorMessage
-                } catch (e: JSONException) {
-                    e.printStackTrace()
-                    statusDisplay?.text = resources.getString(R.string.upload_failed)
+        AuthApiClient.deleteProfilePicture(this,
+            onSuccess = { response ->
+                response.optJSONObject("user")?.let {
+                    AppSettings.setUser(it)
+                    updatePicture()
                 }
 
-                statusDisplay?.setTextColor(resources.getColor(R.color.red, theme))
+                statusDisplay?.text = response.optString("message")
+                statusDisplay?.setTextColor(getColor(R.color.green))
+                progressBar?.visibility = View.INVISIBLE
+            },
+            onError = { message ->
+                statusDisplay?.text = message
+                statusDisplay?.setTextColor(getColor(R.color.red))
                 progressBar?.visibility = View.INVISIBLE
             }
-        }
-
-        val request = object : StringRequest(
-            Method.DELETE, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        requestQueue.add(request)
-        progressBar?.visibility = View.VISIBLE
+        )
     }
 }

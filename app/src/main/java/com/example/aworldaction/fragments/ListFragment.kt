@@ -1,4 +1,4 @@
-package com.example.aworldaction.activities.fragments
+package com.example.aworldaction.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -16,7 +18,7 @@ import com.example.aworldaction.models.ListFragmentModel
 import org.json.JSONObject
 
 class ListFragment : Fragment() {
-    private var model: ListFragmentModel? = null
+    private lateinit var model: ListFragmentModel
     private var toShow: String? = null
     private var viewTitle: TextView? = null
     private var statusDisplay: TextView? = null
@@ -25,7 +27,9 @@ class ListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        model = ListFragmentModel()
+        if (!::model.isInitialized) {
+            model = ViewModelProvider(this)[ListFragmentModel::class.java]
+        }
 
         arguments?.let {
             toShow = it.getString(TO_SHOW)
@@ -47,8 +51,7 @@ class ListFragment : Fragment() {
         val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
 
         swipeRefreshLayout.setOnRefreshListener {
-            model?.loadList(fragmentContext, toShow)
-            recyclerView?.adapter?.notifyDataSetChanged()
+            model.loadList(fragmentContext, toShow)
             swipeRefreshLayout.isRefreshing = false
         }
 
@@ -58,16 +61,22 @@ class ListFragment : Fragment() {
         recyclerView?.layoutManager = LinearLayoutManager(fragmentContext)
         recyclerView?.adapter = CampaignAdapter(emptyList(), fragmentContext)
 
-        model?.campaignList?.observe(viewLifecycleOwner, Observer { campaignList ->
+        model.campaignList.observe(viewLifecycleOwner, Observer { campaignList ->
             recyclerView?.adapter?.let { adapter ->
                 (adapter as CampaignAdapter).setData(campaignList)
             }
 
-            if (model?.campaignList?.value?.size == 0) {
+            if (model.campaignList.value?.size == 0) {
                 statusDisplay?.visibility = View.VISIBLE
                 statusDisplay?.text = resources.getString(R.string.list_empty)
             } else {
                 statusDisplay?.visibility = View.INVISIBLE
+            }
+        })
+
+        model.message.observe(viewLifecycleOwner, Observer { message ->
+            if (message.trim() != "") {
+                statusDisplay?.text = message
             }
         })
 
@@ -79,13 +88,7 @@ class ListFragment : Fragment() {
             else -> "List"
         }
 
-        model?.loadList(fragmentContext, toShow)
-    }
-
-    fun displayError(message: String) {
-        statusDisplay?.visibility = View.VISIBLE
-        statusDisplay?.text = message
-        statusDisplay?.setTextColor(resources.getColor(R.color.danger, context?.theme))
+        model.loadList(fragmentContext, toShow)
     }
 
     companion object {

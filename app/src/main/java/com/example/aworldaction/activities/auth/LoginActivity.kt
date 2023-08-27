@@ -11,7 +11,7 @@ import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.clients.AuthApiClient
+import com.example.aworldaction.clients.AuthApiClient
 import com.example.aworldaction.settings.AppSettings
 
 class LoginActivity : AppCompatActivity() {

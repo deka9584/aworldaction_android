@@ -17,6 +17,7 @@ import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.auth.LoginActivity
 import com.example.aworldaction.activities.auth.RegisterActivity
+import com.example.aworldaction.clients.AuthApiClient
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
@@ -86,10 +87,35 @@ class MainActivity : AppCompatActivity() {
     private fun setupUser() {
         val userToken = AppSettings.getToken()
 
-        if (userToken == null || userToken == "") {
+        if (userToken == null || userToken.isBlank()) {
             showAuthOptions(true)
             return
         }
+
+        showAuthOptions(false)
+        progressBar?.visibility = View.VISIBLE
+
+        AuthApiClient.loadUser(this, userToken,
+            onSuccess = { response ->
+                response.optJSONObject("user")?.let {
+                    AppSettings.setUser(it)
+                    Log.d("user", it.toString())
+                    launchHomeActivity()
+                }
+
+                progressBar?.visibility = View.VISIBLE
+            },
+            onError = { statusCode ->
+                if (statusCode == 0) {
+                    showConnectionError(true)
+                } else {
+                    AppSettings.setToken(null)
+                    showAuthOptions(true)
+                }
+
+                progressBar?.visibility = View.VISIBLE
+            }
+        )
 
         val requestQueue = Volley.newRequestQueue(this)
         val url = AppSettings.getAPIUrl().toString() + "/loggeduser"

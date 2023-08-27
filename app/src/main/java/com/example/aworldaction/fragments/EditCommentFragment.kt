@@ -1,4 +1,4 @@
-package com.example.aworldaction.activities.fragments
+package com.example.aworldaction.fragments
 
 import android.os.Bundle
 import android.text.Editable
@@ -48,7 +48,6 @@ class EditCommentFragment : BottomSheetDialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         commentText = view.findViewById(R.id.commentText)
-        commentText?.text = SpannableStringBuilder(commentBody)
 
         val userPicture = view.findViewById<ImageView>(R.id.userPicture)
         val user = AppSettings.getUser()
@@ -74,6 +73,11 @@ class EditCommentFragment : BottomSheetDialogFragment() {
                 detailActivity?.confirmEditComment(commentId, "${commentText?.text}")
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        commentText?.text = SpannableStringBuilder(commentBody)
     }
 
     fun setComment(commentId: Int, commentBody: String) {

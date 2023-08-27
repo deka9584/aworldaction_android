@@ -57,4 +57,5 @@
     <string name="logout_confirm">Verrai disconnesso</string>
     <string name="server_error">Impossibile connettersi al server</string>
     <string name="retry_btn">Riprova</string>
+    <string name="locality">Località</string>
 </resources>

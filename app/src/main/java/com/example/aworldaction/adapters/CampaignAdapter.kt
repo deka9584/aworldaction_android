@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.DetailActivity
-import com.example.aworldaction.activities.clients.ContentApiClient
+import com.example.aworldaction.clients.ContentApiClient
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 
@@ -141,7 +141,9 @@ class CampaignAdapter(private var dataSet: List<JSONObject>, private val context
 
     private fun toggleFavourites(campaignId: Int, favouritesBtn: ImageButton) {
         ContentApiClient.toggleCampaignFavourite(context, campaignId,
-            onSuccess = { message ->
+            onSuccess = { response ->
+                val message = response.optString("message")
+
                 when (message) {
                     "Campaign detached" -> {
                         favouritesBtn.setImageResource(R.drawable.ic_baseline_star_border_24)
@@ -150,6 +152,7 @@ class CampaignAdapter(private var dataSet: List<JSONObject>, private val context
                         favouritesBtn.setImageResource(R.drawable.ic_baseline_star_24)
                     }
                 }
+
                 Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             },
             onError = { message ->

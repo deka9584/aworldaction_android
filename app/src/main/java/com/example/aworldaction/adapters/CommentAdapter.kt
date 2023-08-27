@@ -3,6 +3,7 @@ package com.example.aworldaction.adapters
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +19,7 @@ import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
 import org.w3c.dom.Text
 
-class CommentAdapter(private val dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
+class CommentAdapter(private var dataSet: List<JSONObject>, private val context: Context) : RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val userImage: ImageView
         val userName: TextView
@@ -106,5 +107,10 @@ class CommentAdapter(private val dataSet: List<JSONObject>, private val context:
 
     override fun getItemCount(): Int {
         return dataSet.size
+    }
+
+    fun setData(newList: List<JSONObject>) {
+        dataSet = newList
+        notifyDataSetChanged()
     }
 }

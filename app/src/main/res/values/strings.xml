@@ -64,4 +64,5 @@
     <string name="logout_confirm">You will be logged out</string>
     <string name="server_error">Unable to reach the server</string>
     <string name="retry_btn">Retry</string>
+    <string name="locality">Locality</string>
 </resources>

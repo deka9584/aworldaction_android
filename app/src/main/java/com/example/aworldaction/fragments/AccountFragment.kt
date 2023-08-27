@@ -1,4 +1,4 @@
-package com.example.aworldaction.activities.fragments
+package com.example.aworldaction.fragments
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
@@ -19,6 +20,7 @@ import com.example.aworldaction.activities.ChangePasswordActivity
 import com.example.aworldaction.R
 import com.example.aworldaction.activities.HomeActivity
 import com.example.aworldaction.activities.UploadPhotoProfileActivity
+import com.example.aworldaction.clients.AuthApiClient
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
@@ -71,34 +73,22 @@ class AccountFragment : Fragment() {
 
     private fun displayUser() {
         val user = AppSettings.getUser()
+        val pictPath = user?.optString("picture_path") ?: ""
+        val pictUrl = if (pictPath.isNotBlank()) AppSettings.getStorageUrl(pictPath) else null
 
-        if (user == null) {
-            Log.w("token", "User is null: ${AppSettings.getToken()}")
-            return
-        }
+        nameDisplay?.text = user?.optString("name")
+        roleDisplay?.text = getString(
+            if ((user?.optInt("role_id") ?: 0) >= 2) R.string.role_admin
+            else R.string.role_user
+        )
 
-        if (user.has("name")) {
-            nameDisplay?.text = user?.getString("name")
-        }
-
-        if (user.has("role_id")) {
-            roleDisplay?.text = resources.getString(
-                if (user.getInt("role_id") >= 2) R.string.role_admin
-                else R.string.role_user
-            )
-        }
-
-        if (user.has("picture_path")) {
-            val url = AppSettings.getStorageUrl(user.getString("picture_path"))
-
-            pictureDisplay?.let {
-                if (url != null) {
-                    Glide.with(requireContext())
-                        .load(url)
-                        .into(it)
-                } else {
-                    it.setImageResource(R.drawable.ic_baseline_account_circle_24)
-                }
+        pictureDisplay?.let {
+            if (pictUrl != null) {
+                Glide.with(requireContext())
+                    .load(pictUrl)
+                    .into(it)
+            } else {
+                it.setImageResource(R.drawable.ic_baseline_account_circle_24)
             }
         }
     }
@@ -124,45 +114,31 @@ class AccountFragment : Fragment() {
     private fun logout() {
         val userToken = AppSettings.getToken()
 
-        if (userToken == null || userToken == "") {
+        if (userToken == null || userToken.isBlank()) {
             homeActivity?.finish()
         }
 
-        val requestQueue = Volley.newRequestQueue(this.context)
-        val url = AppSettings.getAPIUrl().toString() + "/logout"
-
-        val listener = Response.Listener<String> { response ->
-            try {
-                val responseJSON = JSONObject(response)
-
-                if (responseJSON.has("message")) {
-                    Log.d("serverApi", responseJSON.getString("message"))
+        AuthApiClient.logout(requireContext(), "$userToken",
+            onSuccess = { response ->
+                if (response.has("message")) {
+                    Log.d("serverApi", response.getString("message"))
+                    AppSettings.removeToken()
+                    homeActivity?.finish()
                 }
-            } catch (e: JSONException) {
-                e.printStackTrace()
+            },
+            onError = { statusCode ->
+                when (statusCode) {
+                    0 -> Toast.makeText(context, getString(R.string.server_error), Toast.LENGTH_SHORT).show()
+                    401, 403 -> {
+                        AppSettings.removeToken()
+                        homeActivity?.finish()
+                        Toast.makeText(context, "Unauthorized ($statusCode)", Toast.LENGTH_SHORT).show()
+                    }
+                    else -> {
+                        Toast.makeText(context, "Error $statusCode", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
-
-            AppSettings.removeToken()
-            homeActivity?.finish()
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            Log.e("serverAPI", error.toString())
-            Log.e("serverAPI", error.networkResponse.statusCode.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.POST, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $userToken"
-                headers["Content-Type"] = "application/json"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        requestQueue.add(request)
+        )
     }
 }

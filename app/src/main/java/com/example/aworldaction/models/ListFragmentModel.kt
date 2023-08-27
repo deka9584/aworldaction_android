@@ -2,6 +2,7 @@ package com.example.aworldaction.models
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,7 +11,7 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.clients.ContentApiClient
+import com.example.aworldaction.clients.ContentApiClient
 import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONObject
@@ -37,7 +38,7 @@ class ListFragmentModel: ViewModel() {
                 _message.value = response.optString("message")
             },
             onError = { message ->
-                _message.value = message
+                Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             }
         )
     }

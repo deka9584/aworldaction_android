@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.fragments.AccountFragment
-import com.example.aworldaction.activities.fragments.ListFragment
+import com.example.aworldaction.fragments.AccountFragment
+import com.example.aworldaction.fragments.ListFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class HomeActivity : AppCompatActivity() {
@@ -46,7 +46,9 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        switchFragment(inProgressFragment)
+        if (supportFragmentManager.findFragmentById(R.id.fragmentContainer) == null) {
+            switchFragment(inProgressFragment)
+        }
     }
 
     override fun onBackPressed() {

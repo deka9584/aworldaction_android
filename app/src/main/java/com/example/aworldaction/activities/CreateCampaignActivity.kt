@@ -11,7 +11,8 @@ import com.android.volley.Response
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.aworldaction.R
-import com.example.aworldaction.activities.fragments.MapsFragment
+import com.example.aworldaction.clients.ContentApiClient
+import com.example.aworldaction.fragments.MapsFragment
 import com.example.aworldaction.managers.AppLocationManager
 import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
@@ -25,10 +26,10 @@ class CreateCampaignActivity : AppCompatActivity() {
     private var userLocation: Location? = null
     private var progressBar: ProgressBar? = null
     private var titleField: EditText? = null
+    private var mapsFrame: FrameLayout? = null
     private var captionField: EditText? = null
     private var localityDisplay: TextView? = null
     private var statusDisplay: TextView? = null
-    private var mapsFragment: MapsFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class CreateCampaignActivity : AppCompatActivity() {
 
         progressBar = findViewById(R.id.progressBar)
         titleField = findViewById(R.id.titleField)
+        mapsFrame = findViewById(R.id.mapsFragment)
         captionField = findViewById(R.id.captionField)
         localityDisplay = findViewById(R.id.localityDisplay)
         statusDisplay = findViewById(R.id.authStatus)
@@ -95,72 +97,50 @@ class CreateCampaignActivity : AppCompatActivity() {
     }
 
     private fun showMap(loc: Location) {
-        val frame = findViewById<FrameLayout>(R.id.mapsFragment)
-
-        if (mapsFragment == null) {
-            mapsFragment = MapsFragment.newInstance(loc.latitude, loc.longitude)
+        mapsFrame?.let {
+            val mapsFragment = MapsFragment.newInstance(loc.latitude, loc.longitude)
 
             supportFragmentManager
                 .beginTransaction()
-                .replace(frame.id, mapsFragment!!)
+                .replace(it.id, mapsFragment)
                 .commit()
 
-            frame.visibility = View.VISIBLE
+            it.visibility = View.VISIBLE
         }
+
+        appLocationManager?.stopListener()
+    }
+
+    private fun startDetailActivity(campaignId: Int) {
+        val intent = Intent(this, DetailActivity::class.java)
+        intent.putExtra("campaignId", intent)
+        startActivity(intent)
     }
 
     private fun storeCampaign() {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/campaigns"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("campaign")) {
-                val campaign = responseJSON.getJSONObject("campaign")
-
-                if (campaign.has("id")) {
-                    val intent = Intent(this, DetailActivity::class.java)
-                    intent.putExtra("campaignId", campaign.getInt("id"))
-                    startActivity(intent)
-                }
-
-                finish()
-            }
-
-            if (responseJSON.has("message")) {
-                val message = responseJSON.getString("message")
-                statusDisplay?.text = message
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
-
-        val request = object : StringRequest(
-            Method.POST, url, listener, errorListener) {
-
-            override fun getParams(): MutableMap<String, String> {
-                val params = HashMap<String, String>()
-                params["name"] = "${titleField?.text}"
-                params["description"] = "${captionField?.text}"
-                params["location_name"] = "${localityDisplay?.text}"
-                params["location_lat"] = "${userLocation?.latitude}"
-                params["location_lng"] = "${userLocation?.longitude}"
-                return params
-            }
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
+        val params = HashMap<String, String>()
+        params["name"] = "${titleField?.text}"
+        params["description"] = "${captionField?.text}"
+        params["location_name"] = "${localityDisplay?.text}"
+        params["location_lat"] = "${userLocation?.latitude}"
+        params["location_lng"] = "${userLocation?.longitude}"
 
         progressBar?.visibility = View.VISIBLE
-        requestQueue.add(request)
+
+        ContentApiClient.postCampaign(this, params,
+            onSuccess = { response ->
+                response.optJSONObject("campaign")?.let {
+                    startDetailActivity(it.optInt("id"))
+                    finish()
+                }
+
+                progressBar?.visibility = View.INVISIBLE
+            },
+            onError = { message ->
+                statusDisplay?.text = message
+                statusDisplay?.setTextColor(getColor(R.color.red))
+                progressBar?.visibility = View.INVISIBLE
+            }
+        )
     }
 }

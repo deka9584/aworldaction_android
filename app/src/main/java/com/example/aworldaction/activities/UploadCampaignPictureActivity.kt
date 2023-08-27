@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContentProviderCompat.requireContext
@@ -22,12 +23,14 @@ import com.android.volley.Response
 import com.android.volley.toolbox.Volley
 import com.bumptech.glide.Glide
 import com.example.aworldaction.R
+import com.example.aworldaction.clients.ContentApiClient
 import com.example.aworldaction.requests.RequestsHelper
 import com.example.aworldaction.settings.AppSettings
 import org.json.JSONException
 import org.json.JSONObject
 
 class UploadCampaignPictureActivity : AppCompatActivity() {
+    private var campaignId = 0
     private var progressBar: ProgressBar? = null
     private var pictureDisplay: ImageView? = null
     private var pictureCaption: EditText? = null
@@ -39,8 +42,7 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upload_campaign_picture)
 
-        val campaignId = intent.getIntExtra("campaignId", 0)
-
+        campaignId = intent.getIntExtra("campaignId", 0)
         progressBar = findViewById(R.id.progressBar)
         pictureDisplay = findViewById(R.id.pictureDisplay)
         pictureCaption = findViewById(R.id.pictureCaption)
@@ -70,7 +72,7 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
         submitBtn.setOnClickListener {
             if (campaignId != 0 && pictureCaption?.text?.isBlank() == false && imageSelected) {
                 pictureDisplay?.let {
-                    uploadImage(it.drawable, campaignId)
+                    uploadImage(it.drawable)
                 }
             }
         }
@@ -87,54 +89,26 @@ class UploadCampaignPictureActivity : AppCompatActivity() {
         picturePlaceholder?.visibility = View.GONE
     }
 
-    private fun uploadImage(image: Drawable, campaignId: Int) {
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/campaign-pictures"
-        val imageData = AppSettings.getFileDataFromDrawable(image)
+    private fun uploadImage(image: Drawable) {
+        val params = HashMap<String, String>()
+        params["campaign_id"] = "$campaignId"
+        params["caption"] = "${pictureCaption?.text}"
 
-        val listener = Response.Listener<NetworkResponse> { response ->
-            val resultResponse = String(response.data)
-            val result = JSONObject(resultResponse)
-
-            if (result.has("message")) {
-                statusDisplay?.text = result.getString("message")
-                statusDisplay?.setTextColor(resources.getColor(R.color.green, theme))
-            }
-
-            if (result.has("campaignPicture")) {
-                finish()
-            }
-
-            progressBar?.visibility = View.INVISIBLE
-        }
-
-        val errorListener = RequestsHelper.getErrorListener(this, statusDisplay, progressBar)
-
-        val request = object : VolleyMultipartRequest(
-            url,
-            listener,
-            errorListener
-        ) {
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer ${AppSettings.getToken()}"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        imageData?.let {
-            val dataParams = HashMap<String, VolleyMultipartRequest.DataPart>()
-            dataParams["image"] = VolleyMultipartRequest.DataPart("image.jpg", it, "image/jpeg")
-            request.setByteData(dataParams)
-
-            val textParams = HashMap<String, String>()
-            textParams["campaign_id"] = "$campaignId"
-            textParams["caption"] = "${pictureCaption?.text}"
-            request.setTextParams(textParams)
-        }
-
-        requestQueue.add(request)
         progressBar?.visibility = View.VISIBLE
+
+        ContentApiClient.postPicture(this, params, image,
+            onSuccess = { response ->
+                val message = response.optString("message")
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+                Log.d("serverApi", message)
+                progressBar?.visibility = View.INVISIBLE
+                finish()
+            },
+            onError = { message ->
+                statusDisplay?.text = message
+                statusDisplay?.setTextColor(getColor(R.color.red))
+                progressBar?.visibility = View.INVISIBLE
+            }
+        )
     }
 }

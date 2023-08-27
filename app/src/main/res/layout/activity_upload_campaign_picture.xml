@@ -46,9 +46,9 @@
                 android:id="@+id/pictureDisplay"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:src="@drawable/ic_launcher_background"
+                android:src="@drawable/logo_app"
                 android:adjustViewBounds="true"
-                android:scaleType="fitXY"
+                android:scaleType="centerCrop"
                 android:visibility="gone"/>
 
             <LinearLayout
