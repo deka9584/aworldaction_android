@@ -35,6 +35,8 @@ class ContributorAdapter(private var dataSet: List<JSONObject>, private val cont
             viewHolder.name.text = name
         }
 
+        viewHolder.name.text = contributorJSON.optString("name")
+
         if (contributorJSON.has("picture_path")) {
             val imageUrl = AppSettings.getStorageUrl(contributorJSON.getString("picture_path"))
 
@@ -43,9 +45,9 @@ class ContributorAdapter(private var dataSet: List<JSONObject>, private val cont
                     .load(imageUrl)
                     .centerCrop()
                     .into(viewHolder.image)
-            } else {
-                viewHolder.image.setImageResource(R.drawable.ic_baseline_account_circle_24)
             }
+        } else {
+            viewHolder.image.setImageResource(R.drawable.ic_baseline_account_circle_24)
         }
     }
 

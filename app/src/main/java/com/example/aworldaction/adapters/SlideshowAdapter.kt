@@ -33,7 +33,7 @@ class SlideshowAdapter(private val images: List<JSONObject>, private val context
         val captionDisplay = slideshowItem.findViewById<TextView>(R.id.camptionDisplay)
         val dateDisplay = slideshowItem.findViewById<TextView>(R.id.dateDisplay)
         val deletePictureBtn = slideshowItem.findViewById<ImageButton>(R.id.deletePictureBtn)
-        var loggedUserIsCreator = false
+        val loggedUserIsCreator = imageJSON.optInt("user_id") == AppSettings.getUserID()
 
         if (imageJSON.has("path")) {
             val imageUrl = AppSettings.getStorageUrl(imageJSON.getString("path"))
@@ -44,24 +44,8 @@ class SlideshowAdapter(private val images: List<JSONObject>, private val context
                 .into(imageView)
         }
 
-        if (imageJSON.has("caption")) {
-            captionDisplay.text = imageJSON.getString("caption")
-        }
-
-        if (imageJSON.has("created_at")) {
-            val date = imageJSON.getString("created_at")
-            dateDisplay.text = AppSettings.formatDateString(date)
-        }
-
-        if (imageJSON.has("user_id")) {
-            val loggedUser = AppSettings.getUser()
-
-            if (loggedUser != null && loggedUser.has("id")) {
-                loggedUserIsCreator =
-                    imageJSON.getInt("user_id") == loggedUser.getInt("id")
-            }
-        }
-
+        captionDisplay.text = imageJSON.optString("caption")
+        dateDisplay.text = AppSettings.formatDateString(imageJSON.optString("created_at"))
         deletePictureBtn.visibility = if (loggedUserIsCreator) View.VISIBLE else View.GONE
 
         deletePictureBtn.setOnClickListener {

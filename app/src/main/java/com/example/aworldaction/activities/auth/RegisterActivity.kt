@@ -47,13 +47,8 @@ class RegisterActivity : AppCompatActivity() {
         val registerBtn = findViewById<Button>(R.id.registerBtn)
         registerBtn.setOnClickListener {
             if (progressBar?.visibility == View.INVISIBLE) {
-                val username = userField?.text.toString()
-                val email = emailField?.text.toString()
-                val password = passwordField?.text.toString()
-                val passwordConfirm = passwordConfirmField?.text.toString()
-
-                if (username.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
-                    sendRegisterRequest(username, email, password, passwordConfirm)
+                if (userField?.text?.isNotBlank() == true && emailField?.text?.isNotBlank() == true) {
+                    sendRegisterRequest()
                     resetFields()
                 }
             }
@@ -67,12 +62,12 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendRegisterRequest(username: String, email: String, password: String, passwordConfirm: String) {
+    private fun sendRegisterRequest() {
         val params = HashMap<String, String>()
-        params["name"] = username
-        params["email"] = email
-        params["password"] = password
-        params["password_confirmation"] = passwordConfirm
+        params["name"] = "${userField?.text}"
+        params["email"] = "${emailField?.text}"
+        params["password"] = "${passwordField?.text}"
+        params["password_confirmation"] = "${passwordConfirmField?.text}"
 
         progressBar?.visibility = View.VISIBLE
 

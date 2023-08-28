@@ -46,32 +46,18 @@ class CampaignAdapter(private var dataSet: List<JSONObject>, private val context
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val campaign = dataSet[position]
 
-        if (campaign.has("name")) {
-            viewHolder.title.text = campaign.getString("name")
-        }
+        viewHolder.title.text = campaign.optString("name")
+        viewHolder.locality.text = campaign.optString("location_name")
+        viewHolder.description.text = campaign.optString("description")
 
-        if (campaign.has("location_name")) {
-            viewHolder.locality.text = campaign.getString("location_name")
-        }
+        campaign.optJSONArray("pictures")?.let {
+            if (it.length() > 0) {
+                val path = it.getJSONObject(0).optString("path")
+                val url = AppSettings.getStorageUrl(path)
 
-        if (campaign.has("description")) {
-            viewHolder.description.text = campaign.getString("description")
-        }
-
-        if (campaign.has("pictures")) {
-            val pictures = campaign.getJSONArray("pictures")
-
-            if (pictures.length() > 0) {
-                val firstPicture = pictures.getJSONObject(0)
-
-                if (firstPicture.has("path")) {
-                    val url = AppSettings.getStorageUrl(firstPicture.getString("path"))
-
-                    Glide.with(context)
-                        .load(url)
-                        .into(viewHolder.image)
-
-                }
+                Glide.with(context)
+                    .load(url)
+                    .into(viewHolder.image)
             } else {
                 Glide.with(context)
                     .load(context.resources.getDrawable(R.mipmap.picture_placeholder_foreground, context.theme))
@@ -79,18 +65,14 @@ class CampaignAdapter(private var dataSet: List<JSONObject>, private val context
             }
         }
 
-        if (campaign.has("completed")) {
-            viewHolder.progress.visibility =
-                if (campaign.getInt("completed") == 1) View.VISIBLE
-                else View.GONE
-        }
+        viewHolder.progress.visibility =
+            if (campaign.optInt("completed") == 1) View.VISIBLE else View.GONE
 
-        if (campaign.has("contributors")) {
-            val contributors = campaign.getJSONArray("contributors")
+        campaign.optJSONArray("contributors")?.let {
             var isUserContributor = false
 
-            for (i in 0 until contributors.length()) {
-                if (contributors.getJSONObject(i).getInt("id") == AppSettings.getUserID()) {
+            for (i in 0 until it.length()) {
+                if (it.getJSONObject(i).getInt("id") == AppSettings.getUserID()) {
                     isUserContributor = true
                     break
                 }
@@ -102,11 +84,9 @@ class CampaignAdapter(private var dataSet: List<JSONObject>, private val context
             )
         }
 
-        if (campaign.has("creator_id")) {
-            val crId = campaign.getJSONArray("creator_id")
-
-            for (i in 0 until crId.length()) {
-                if (crId.getInt(i) == AppSettings.getUserID()) {
+        campaign.optJSONArray("creator_id")?.let {
+            for (i in 0 until it.length()) {
+                if (it.getInt(i) == AppSettings.getUserID()) {
                     viewHolder.favouritesBtn.setImageResource(R.drawable.ic_baseline_favorite_24)
                     viewHolder.favouritesBtn.isEnabled = false
                     break

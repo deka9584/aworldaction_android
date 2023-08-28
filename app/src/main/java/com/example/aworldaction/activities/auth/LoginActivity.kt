@@ -37,11 +37,8 @@ class LoginActivity : AppCompatActivity() {
         val loginBtn = findViewById<Button>(R.id.loginBtn)
         loginBtn.setOnClickListener {
             if (progressBar?.visibility == View.INVISIBLE) {
-                val email = emailField?.text.toString()
-                val password = passwordField?.text.toString()
-
-                if (email.isNotBlank() && password.isNotBlank()) {
-                    sendLoginRequest(email, password)
+                if (emailField?.text?.isNotBlank() == true && passwordField?.text?.isNotBlank() == true) {
+                    sendLoginRequest()
                     resetFields()
                 }
             }
@@ -55,10 +52,10 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendLoginRequest(email: String, password: String) {
+    private fun sendLoginRequest() {
         val params = HashMap<String, String>()
-        params["email"] = email
-        params["password"] = password
+        params["email"] = "${emailField?.text}"
+        params["password"] = "${passwordField?.text}"
 
         progressBar?.visibility = View.VISIBLE
 

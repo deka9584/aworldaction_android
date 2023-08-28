@@ -2,6 +2,7 @@ package com.example.aworldaction.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -148,9 +149,9 @@ class DetailActivity : AppCompatActivity() {
     private fun showComments(comments: List<JSONObject>) {
         userPicture?.let {
             val path = AppSettings.getUser()?.optString("picture_path")
+            val url = if (path?.isNotBlank() == true) AppSettings.getStorageUrl(path) else null
 
-            if (path != null && path.isNotBlank()) {
-                val url = AppSettings.getStorageUrl(path)
+            if (url != null) {
                 Glide.with(this)
                     .load(url)
                     .into(it)

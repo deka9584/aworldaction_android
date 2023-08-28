@@ -31,7 +31,7 @@ class HomeActivity : AppCompatActivity() {
                     return@setOnItemSelectedListener true
                 }
                 R.id.menu_new_campaign -> {
-                    showCreateCampaign()
+                    startCreateCampaignActivity()
                     return@setOnItemSelectedListener false
                 }
                 R.id.menu_completed -> {
@@ -62,7 +62,7 @@ class HomeActivity : AppCompatActivity() {
             .commit()
     }
 
-    private fun showCreateCampaign() {
+    private fun startCreateCampaignActivity() {
         val intent = Intent(this, CreateCampaignActivity::class.java)
         startActivity(intent)
     }

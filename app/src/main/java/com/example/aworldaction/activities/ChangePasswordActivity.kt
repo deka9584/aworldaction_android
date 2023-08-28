@@ -39,12 +39,8 @@ class ChangePasswordActivity : AppCompatActivity() {
 
         val submitBtn = findViewById<Button>(R.id.submitBtn)
         submitBtn.setOnClickListener {
-            val currentPass = currentPassField?.text.toString()
-            val pass = passField?.text.toString()
-            val passConfirm = passConfirmField?.text.toString()
-
-            if (currentPass.isNotBlank() && pass.isNotBlank() && passConfirm.isNotBlank()) {
-                sendChangePassRequest(currentPass, pass, passConfirm)
+            if (currentPassField?.text?.isNotBlank() == true) {
+                sendChangePassRequest()
                 resetFields()
             }
         }
@@ -55,11 +51,11 @@ class ChangePasswordActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendChangePassRequest(currPass: String, pass: String, passConfirm: String) {
+    private fun sendChangePassRequest() {
         val params = HashMap<String, String>()
-        params["current_password"] = currPass
-        params["password"] = pass
-        params["password_confirmation"] = passConfirm
+        params["current_password"] = "${currentPassField?.text}"
+        params["password"] = "${passField?.text}"
+        params["password_confirmation"] = "${passConfirmField?.text}"
 
         progressBar?.visibility = View.VISIBLE
 

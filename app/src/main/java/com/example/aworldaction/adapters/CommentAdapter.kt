@@ -45,31 +45,21 @@ class CommentAdapter(private var dataSet: List<JSONObject>, private val context:
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
         val comment = dataSet[position]
-        var loggedUserIsCreator = false
+        val loggedUserIsCreator = comment.optInt("user_id") == AppSettings.getUserID()
+
+        viewHolder.userName.text = comment.optString("user_name")
+        viewHolder.commentText.text = comment.optString("body")
 
         if (comment.has("picture_path")) {
             val url = AppSettings.getStorageUrl(comment.getString("picture_path"))
 
-            Glide.with(context)
-                .load(url)
-                .into(viewHolder.userImage)
-        }
-
-        if (comment.has("user_name")) {
-            viewHolder.userName.text = comment.getString("user_name")
-        }
-
-        if (comment.has("body")) {
-            viewHolder.commentText.text = comment.getString("body")
-        }
-
-        if (comment.has("user_id")) {
-            val loggedUser = AppSettings.getUser()
-
-            if (loggedUser != null && loggedUser.has("id")) {
-                loggedUserIsCreator =
-                    comment.getInt("user_id") == loggedUser.getInt("id")
+            if (url != null) {
+                Glide.with(context)
+                    .load(url)
+                    .into(viewHolder.userImage)
             }
+        } else {
+            viewHolder.userImage.setImageResource(R.drawable.ic_baseline_account_circle_24)
         }
 
         if (comment.has("created_at") && comment.has("updated_at")) {

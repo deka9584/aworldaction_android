@@ -23,8 +23,6 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
     private var progressBar: ProgressBar? = null
-    private var authOptionsView: LinearLayout? = null
-    private var connectionErrorView: LinearLayout? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,13 +32,8 @@ class MainActivity : AppCompatActivity() {
         AppSettings.init(this)
 
         progressBar = findViewById(R.id.progressBar)
-        authOptionsView = findViewById(R.id.authOptionsView)
-        connectionErrorView = findViewById(R.id.connectionErrorView)
 
         val loginBtn = findViewById<Button>(R.id.loginBtn)
-        val registerBtn = findViewById<Button>(R.id.registerBtn)
-        val retryBtn = findViewById<Button>(R.id.retryBtn)
-
         loginBtn?.setOnClickListener {
             if (progressBar?.isVisible == false) {
                 val intent = Intent(this, LoginActivity::class.java)
@@ -48,6 +41,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val registerBtn = findViewById<Button>(R.id.registerBtn)
         registerBtn?.setOnClickListener {
             if (progressBar?.isVisible == false) {
                 val intent = Intent(this, RegisterActivity::class.java)
@@ -55,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val retryBtn = findViewById<Button>(R.id.retryBtn)
         retryBtn.setOnClickListener {
             if (progressBar?.isVisible == false) {
                 showConnectionError(false)
@@ -76,12 +71,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun showAuthOptions(show: Boolean) {
         progressBar?.visibility = View.GONE
-        authOptionsView?.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        findViewById<LinearLayout>(R.id.authOptionsView)?.visibility =
+            if (show) View.VISIBLE else View.INVISIBLE
     }
 
     private fun showConnectionError(show: Boolean) {
         progressBar?.visibility = View.GONE
-        connectionErrorView?.visibility = if (show) View.VISIBLE else View.INVISIBLE
+        findViewById<LinearLayout>(R.id.connectionErrorView)?.visibility =
+            if (show) View.VISIBLE else View.INVISIBLE
     }
 
     private fun setupUser() {
@@ -103,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                     launchHomeActivity()
                 }
 
-                progressBar?.visibility = View.VISIBLE
+                progressBar?.visibility = View.GONE
             },
             onError = { statusCode ->
                 if (statusCode == 0) {
@@ -113,49 +110,8 @@ class MainActivity : AppCompatActivity() {
                     showAuthOptions(true)
                 }
 
-                progressBar?.visibility = View.VISIBLE
+                progressBar?.visibility = View.GONE
             }
         )
-
-        val requestQueue = Volley.newRequestQueue(this)
-        val url = AppSettings.getAPIUrl().toString() + "/loggeduser"
-
-        val listener = Response.Listener<String> { response ->
-            val responseJSON = JSONObject(response)
-
-            if (responseJSON.has("user")) {
-                val user = responseJSON.getJSONObject("user")
-
-                AppSettings.setUser(user)
-                Log.d("user", user.toString())
-                launchHomeActivity()
-            }
-        }
-
-        val errorListener = Response.ErrorListener { error ->
-            if (error is NoConnectionError) {
-                showConnectionError(true)
-            } else {
-                AppSettings.setToken(null)
-                showAuthOptions(true)
-            }
-
-            Log.e("serverAPI", error.toString())
-        }
-
-        val request = object : StringRequest(
-            Method.GET, url, listener, errorListener) {
-
-            override fun getHeaders(): MutableMap<String, String> {
-                val headers = HashMap<String, String>()
-                headers["Authorization"] = "Bearer $userToken"
-                headers["Content-Type"] = "application/json"
-                headers["Accept"] = "application/json"
-                return headers
-            }
-        }
-
-        progressBar?.visibility = View.VISIBLE
-        requestQueue.add(request)
     }
 }

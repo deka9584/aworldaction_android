@@ -61,11 +61,7 @@ class CreateCampaignActivity : AppCompatActivity() {
 
         val submitBtn = findViewById<Button>(R.id.submitBtn)
         submitBtn?.setOnClickListener {
-            if (
-                titleField?.text?.isBlank() == false &&
-                captionField?.text?.isBlank() == false &&
-                userLocation != null
-            ) {
+            if (titleField?.text?.isNotBlank() == true && userLocation != null) {
                 storeCampaign()
             }
         }
